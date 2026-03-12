@@ -65,28 +65,40 @@ body{background:transparent;font-family:Oswald,sans-serif;width:1920px;overflow:
 let lsR=-1,lsB=-1,last=null,wT=null;
 function fmt(s){return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
 function gM(S,id){if(!id||!S.bracket)return null;for(const r of S.bracket)for(const m of r.matches)if(m.id===id)return m;return null}
-function upd(){
-  const raw=localStorage.getItem("pt_state");if(!raw)return;
-  let S;try{S=JSON.parse(raw)}catch(e){return}
-  const m=gM(S,S.currentMatchId);
-  document.getElementById("rN").textContent=m?.fighter1||" ";
-  document.getElementById("bN").textContent=m?.fighter2||" ";
-  document.getElementById("cRT").textContent=m?.roundName||" ";
-  const tv=document.getElementById("cT");
-  tv.textContent=fmt(S.timerSec||0);
-  tv.className="tmr"+(S.timerSec<=10&&S.timerSec>0?" danger":"");
-  const sr=document.getElementById("sR"),sb=document.getElementById("sB");
-  if(S.scoreRed!==lsR){sr.textContent=S.scoreRed||0;sr.classList.remove("sf");void sr.offsetWidth;sr.classList.add("sf");lsR=S.scoreRed}
-  if(S.scoreBlue!==lsB){sb.textContent=S.scoreBlue||0;sb.classList.remove("sf");void sb.offsetWidth;sb.classList.add("sf");lsB=S.scoreBlue}
-  for(let i=1;i<=3;i++){const p=document.getElementById("rp"+i);p.className="rp"+(i<S.currentRound?" done":"")+(i===S.currentRound?" active":"");}
-  if(m?.winner){const lm=last?gM(last,last.currentMatchId):null;if(!lm?.winner||lm.winner!==m.winner)showWin(m.winner,m.fighter1,m.fighter2);}
-  if(S.champion&&!last?.champion)showChamp(S.champion);
-  document.getElementById("liveB").style.display=S.timerRunning?"block":"none";
-  last=JSON.parse(raw);
+let BIN_ID = "COLOCA_AQUI_O_BIN";
+let API_KEY = "COLOCA_AQUI_A_MASTER_KEY";
+
+async function upd(){
+  try{
+    const r = await fetch("https://api.jsonbin.io/v3/b/"+BIN_ID+"/latest",{
+      headers:{ "X-Master-Key": API_KEY }
+    });
+
+    const j = await r.json();
+    const S = j.record;
+
+    if(!S) return;
+
+    const m=gM(S,S.currentMatchId);
+
+    document.getElementById("rN").textContent=m?.fighter1||" ";
+    document.getElementById("bN").textContent=m?.fighter2||" ";
+    document.getElementById("cRT").textContent=m?.roundName||" ";
+
+    const tv=document.getElementById("cT");
+    tv.textContent=fmt(S.timerSec||0);
+
+    const sr=document.getElementById("sR");
+    const sb=document.getElementById("sB");
+
+    sr.textContent=S.scoreRed||0;
+    sb.textContent=S.scoreBlue||0;
+
+  }catch(e){}
 }
 function showWin(n,f1,f2){clearTimeout(wT);const s=document.getElementById("wSpl"),b=document.getElementById("wCB"),nm=document.getElementById("wNm");b.className="wcb"+(n===f1?" r":" b");b.textContent=n===f1?"&#x25CF; CANTO VERMELHO":"&#x25CF; CANTO AZUL";nm.textContent=n;s.classList.add("show");conf(40);wT=setTimeout(()=>s.classList.remove("show"),6000);}
 function showChamp(n){document.getElementById("cNm").textContent=n;document.getElementById("cOv").classList.add("show");conf(120);}
 function conf(n){const c=document.getElementById("pts");c.innerHTML="";const cols=["#bb2000","#1840bb","#d4a800","#fff","#4a5a2e"];for(let i=0;i<n;i++){const p=document.createElement("div");p.className="pt";p.style.left=Math.random()*100+"vw";p.style.background=cols[Math.floor(Math.random()*cols.length)];const z=Math.random()*10+4;p.style.width=z+"px";p.style.height=z+"px";p.style.borderRadius=Math.random()>.5?"50%":"2px";p.style.animationDuration=(Math.random()*3+2)+"s";p.style.animationDelay=(Math.random()*2)+"s";c.appendChild(p);}setTimeout(()=>c.innerHTML="",7000);}
-setInterval(upd,200);upd();
+setInterval(upd,2000);upd();
 <\/script>
 </body></html>
