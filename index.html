@@ -536,34 +536,42 @@ async function initSupa(url, key) {
 }
 
 // ─── INIT ─────────────────────────────────────────────────
-async function init() {
-  // Garantir que o loading desaparece SEMPRE ao fim de 6 segundos
-  setTimeout(hideLoading, 6000);
+function init() {
+  // Carregar dados locais imediatamente
+  const lc = localStorage.getItem('pt_state');
+  if (lc) try { S = {...S, ...JSON.parse(lc), timerRunning:false}; } catch(e){}
 
-  // 1. Tentar credenciais hardcoded no ficheiro
-  if (HARDCODED_URL && HARDCODED_URL !== '__SB_URL__' && HARDCODED_KEY !== '__SB_KEY__') {
-    await withTimeout(initSupa(HARDCODED_URL, HARDCODED_KEY), 5000);
-  }
-  // 2. Fallback: credenciais guardadas no localStorage (admin no mesmo browser)
-  if (!supa) {
-    const url=localStorage.getItem('pt_sb_url'), key=localStorage.getItem('pt_sb_key');
-    if (url && key) await withTimeout(initSupa(url, key), 5000);
-  }
-
-  // Carregar dados (com timeout)
-  const d = await withTimeout(dbLoad(), 4000);
-  if (d) S = {...S,...d,timerRunning:false};
-
-  // Esconder loading e mostrar site
+  // Mostrar site IMEDIATAMENTE — nunca fica preso no loading
   hideLoading();
-
-  // Mostrar botão ☁ config para quem tem credenciais (admin)
-  if (localStorage.getItem('pt_sb_url') || (HARDCODED_URL && HARDCODED_URL !== '__SB_URL__')) {
-    document.getElementById('cfgBtn').style.display = 'inline-flex';
-  }
-
   renderAll();
   setInterval(listenTP, 200);
+
+  // Ligar Supabase em background (nao bloqueia nada)
+  const url = (HARDCODED_URL && HARDCODED_URL !== '__SB_URL__') ? HARDCODED_URL
+            : localStorage.getItem('pt_sb_url');
+  const key = (HARDCODED_KEY && HARDCODED_KEY !== '__SB_KEY__') ? HARDCODED_KEY
+            : localStorage.getItem('pt_sb_key');
+
+  if (url && key) {
+    document.getElementById('cfgBtn').style.display = 'inline-flex';
+    try {
+      supa = createClient(url, key);
+      supa.from('boxing_state').select('data').eq('id','main').single()
+        .then(({data, error}) => {
+          if (!error && data?.data) {
+            S = {...S, ...data.data, timerRunning:false};
+            localStorage.setItem('pt_state', JSON.stringify(S));
+            renderAll();
+            updateDbStat(true);
+          }
+        })
+        .catch(() => updateDbStat(false));
+      startRealtime();
+    } catch(e) {
+      supa = null;
+      updateDbStat(false);
+    }
+  }
 }
 
 // ─── SETUP ────────────────────────────────────────────────
