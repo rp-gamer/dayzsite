@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PT Boxing Championship</title>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
@@ -450,11 +451,11 @@ body::before{content:'';position:fixed;inset:0;opacity:.45;pointer-events:none;z
 
 <script>
 // ═══════════════════════════════════════════════════════════
-// CREDENCIAIS — preenchidas automaticamente quando o admin
-// faz download do ficheiro via "⬇ Download index.html (com BD)"
+// CREDENCIAIS — lidas do ficheiro config.js
+// Edita só o config.js com a tua URL e Key do Supabase
 // ═══════════════════════════════════════════════════════════
-const HARDCODED_URL = '__SB_URL__';   // substituído no download
-const HARDCODED_KEY = '__SB_KEY__';   // substituído no download
+const HARDCODED_URL = (typeof SUPABASE_URL !== 'undefined') ? SUPABASE_URL : '';
+const HARDCODED_KEY = (typeof SUPABASE_KEY !== 'undefined') ? SUPABASE_KEY : '';
 
 const { createClient } = supabase;
 let supa = null, realtimeCh = null;
@@ -509,11 +510,25 @@ function updateDbStat(ok) {
   else { el.className='dbst na'; el.textContent='◌ SEM BD — dados apenas locais'; }
 }
 
+function hideLoading() {
+  document.getElementById('loading').style.display = 'none';
+}
+
+function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise(resolve => setTimeout(() => resolve(false), ms))
+  ]);
+}
+
 async function initSupa(url, key) {
   try {
     supa = createClient(url, key);
-    const {error} = await supa.from('boxing_state').select('id').limit(1);
-    if (error) throw error;
+    const result = await withTimeout(
+      supa.from('boxing_state').select('id').limit(1),
+      5000  // 5 segundos máximo
+    );
+    if (!result || result.error) throw new Error('timeout or error');
     updateDbStat(true);
     startRealtime();
     return true;
@@ -522,25 +537,28 @@ async function initSupa(url, key) {
 
 // ─── INIT ─────────────────────────────────────────────────
 async function init() {
-  // 1. Tentar credenciais hardcoded no ficheiro (utilizadores sem setup)
+  // Garantir que o loading desaparece SEMPRE ao fim de 6 segundos
+  setTimeout(hideLoading, 6000);
+
+  // 1. Tentar credenciais hardcoded no ficheiro
   if (HARDCODED_URL && HARDCODED_URL !== '__SB_URL__' && HARDCODED_KEY !== '__SB_KEY__') {
-    await initSupa(HARDCODED_URL, HARDCODED_KEY);
+    await withTimeout(initSupa(HARDCODED_URL, HARDCODED_KEY), 5000);
   }
   // 2. Fallback: credenciais guardadas no localStorage (admin no mesmo browser)
   if (!supa) {
     const url=localStorage.getItem('pt_sb_url'), key=localStorage.getItem('pt_sb_key');
-    if (url && key) await initSupa(url, key);
+    if (url && key) await withTimeout(initSupa(url, key), 5000);
   }
 
-  // Carregar dados
-  const d = await dbLoad();
+  // Carregar dados (com timeout)
+  const d = await withTimeout(dbLoad(), 4000);
   if (d) S = {...S,...d,timerRunning:false};
 
-  // Esconder loading, mostrar site
-  document.getElementById('loading').style.display = 'none';
+  // Esconder loading e mostrar site
+  hideLoading();
 
-  // Mostrar botão config só para quem tem credenciais guardadas (admin)
-  if (localStorage.getItem('pt_sb_url')) {
+  // Mostrar botão ☁ config para quem tem credenciais (admin)
+  if (localStorage.getItem('pt_sb_url') || (HARDCODED_URL && HARDCODED_URL !== '__SB_URL__')) {
     document.getElementById('cfgBtn').style.display = 'inline-flex';
   }
 
