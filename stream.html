@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>PT Boxing Stream</title>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--re:#bb2000;--bl:#1840bb;--go:#d4a800;--gb:#f0c000;}
@@ -124,8 +125,8 @@ body{background:transparent;width:1920px;height:200px;overflow:hidden;font-famil
 </div>
 <script>
 const { createClient } = supabase;
-const SB_URL = '';
-const SB_KEY = '';
+const SB_URL = (typeof SUPABASE_URL !== 'undefined') ? SUPABASE_URL : '';
+const SB_KEY = (typeof SUPABASE_KEY !== 'undefined') ? SUPABASE_KEY : '';
 let supa=null, lsR=-1, lsB=-1, lastWin=null, lastChamp=null, wT=null;
 function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
 function getM(S,id){if(!id||!S.bracket)return null;for(const r of S.bracket)for(const m of r.matches)if(m.id===id)return m;return null;}
