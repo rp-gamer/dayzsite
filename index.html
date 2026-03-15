@@ -507,7 +507,7 @@ function subscribeRealtime() {
       event: 'UPDATE', schema: 'public',
       table: 'boxing_state', filter: 'id=eq.main'
     }, payload => {
-      if (isAdmin) return; // admin é a fonte — não sobrescreve
+      //if (isAdmin) return; // admin é a fonte — não sobrescreve
       if (payload.new?.data) applyState(payload.new.data);
     })
     .subscribe();
