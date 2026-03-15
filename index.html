@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PT Boxing Championship</title>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
@@ -453,9 +452,8 @@ body{background:var(--dk);color:var(--tx);font-family:'Rajdhani',sans-serif;min-
 // ═══════════════════════════════════════════════════════
 const { createClient } = supabase;
 
-// Credenciais do config.js
-const SB_URL = (typeof SUPABASE_URL !== 'undefined') ? SUPABASE_URL : '';
-const SB_KEY = (typeof SUPABASE_KEY !== 'undefined') ? SUPABASE_KEY : '';
+const SB_URL = 'https://xzkvpaokqbdjlsozjqut.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6a3ZwYW9rcWJkamxzb3pqcXV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzNDExMTksImV4cCI6MjA4ODkxNzExOX0.Av2vtyeQ6hpX9r_0clJWDeOFsY6h74RZ63l5-3Fw7zI';
 
 let db = null;
 let rtChannel = null;
