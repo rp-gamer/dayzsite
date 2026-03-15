@@ -452,6 +452,7 @@ body{background:var(--dk);color:var(--tx);font-family:'Rajdhani',sans-serif;min-
 // ═══════════════════════════════════════════════════════
 const { createClient } = supabase;
 
+// Credenciais do config.js
 const SB_URL = 'https://xzkvpaokqbdjlsozjqut.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6a3ZwYW9rcWJkamxzb3pqcXV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzNDExMTksImV4cCI6MjA4ODkxNzExOX0.Av2vtyeQ6hpX9r_0clJWDeOFsY6h74RZ63l5-3Fw7zI';
 
@@ -505,13 +506,14 @@ function subscribeRealtime() {
       event: 'UPDATE', schema: 'public',
       table: 'boxing_state', filter: 'id=eq.main'
     }, payload => {
-      //if (isAdmin) return; // admin é a fonte — não sobrescreve
-      if (payload.new?.data) applyState(payload.new.data);
+      if (!isAdmin && payload.new?.data) applyState(payload.new.data);
     })
     .subscribe();
 }
 
 function applyState(data) {
+  // Admin é a fonte — nunca recebe push que mate o timer
+  if (isAdmin) return;
   S = { ...S, ...data, timerRunning: false };
   localStorage.setItem('pt_state', JSON.stringify(S));
   renderAll();
