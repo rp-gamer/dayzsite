@@ -50,31 +50,23 @@ body{background:transparent;width:1920px;height:100vh;overflow:hidden;font-famil
   padding:2px 9px;font-family:"Share Tech Mono",monospace;font-size:9px;letter-spacing:3px;
   color:white;animation:lp 2s infinite;display:none}
 @keyframes lp{0%,100%{opacity:1}50%{opacity:.5}}
-.wspl{position:fixed;inset:0;display:none;background:rgba(6,7,6,.93);z-index:200;
-  grid-template-columns:1fr 340px 1fr;align-items:center;padding:0 40px;gap:0;
-  width:1920px;height:100vh}
-.wspl::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--re),var(--go),var(--bl))}
-.wspl.show{display:grid;animation:wIn .5s ease}
-@keyframes wIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
-.wside-r{display:flex;align-items:center;height:160px;
-  background:linear-gradient(90deg,rgba(139,0,0,.3),transparent);
-  padding:16px 28px 16px 16px;border-left:3px solid rgba(187,32,0,.85);border-radius:3px 0 0 3px}
-.wside-b{display:flex;align-items:center;flex-direction:row-reverse;height:160px;
-  background:linear-gradient(270deg,rgba(0,30,120,.3),transparent);
-  padding:16px 16px 16px 28px;border-right:3px solid rgba(24,64,187,.85);border-radius:0 3px 3px 0}
-.wlbl{font-family:"Share Tech Mono",monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;margin-bottom:5px}
-.wside-r .wlbl{color:rgba(220,100,80,.8)}.wside-b .wlbl{color:rgba(80,130,230,.8)}
-.wname{font-size:52px;font-weight:700;letter-spacing:2px;text-transform:uppercase;line-height:1;color:#fff}
-.wcenter{display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 16px}
-.wtrophy{font-size:56px;animation:flt 1s ease-in-out infinite}
+
+
+
+to{opacity:1;transform:scale(1)}}
+
+
+
+.wside-r .wside-b 
+
+
+
 @keyframes flt{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-.wlabel{font-family:"Share Tech Mono",monospace;font-size:12px;letter-spacing:5px;text-transform:uppercase;color:rgba(255,255,255,.5)}
-.wwin{font-size:72px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
-  color:var(--gb);text-shadow:0 0 60px rgba(212,168,0,.7);animation:sh 2s ease infinite;text-align:center}
-@keyframes sh{0%,100%{text-shadow:0 0 60px rgba(212,168,0,.6)}50%{text-shadow:0 0 110px rgba(212,168,0,1)}}
-.cov{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;
-  background:rgba(6,7,6,.96);z-index:300;width:1920px;height:100vh}
+
+
+50%{text-shadow:0 0 110px rgba(212,168,0,1)}}
+.cov{position:fixed;top:0;left:0;display:none;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(6,7,6,.96);z-index:300;width:1920px;height:1080px}
 .cov.show{display:flex}
 .cico{font-size:72px;animation:flt 1.2s ease-in-out infinite}
 .clbl{font-family:"Share Tech Mono",monospace;font-size:13px;letter-spacing:8px;color:rgba(255,255,255,.38);
@@ -82,6 +74,23 @@ body{background:transparent;width:1920px;height:100vh;overflow:hidden;font-famil
 .cnm{font-size:96px;font-weight:700;letter-spacing:4px;text-transform:uppercase;
   color:var(--gb);text-shadow:0 0 100px rgba(212,168,0,.75)}
 @keyframes sfl{0%{transform:scale(1)}30%{transform:scale(1.4)}100%{transform:scale(1)}}.sf{animation:sfl .4s ease}
+
+/* WINNER dentro da barra */
+.bar.win-show .side-r, .bar.win-show .side-b, .bar.win-show .center { display:none }
+.win-bar{display:none;width:100%;align-items:center;justify-content:center;gap:40px;padding:0 40px}
+.bar.win-show .win-bar{display:flex}
+.win-side{display:flex;flex-direction:column;justify-content:center;min-width:320px}
+.win-side.rt{text-align:right;align-items:flex-end}
+.win-tag{font-family:"Share Tech Mono",monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;margin-bottom:6px}
+.win-tag.r{color:rgba(220,100,80,.8)}.win-tag.b{color:rgba(80,130,230,.8)}.win-tag.trophy{color:var(--go)}
+.win-name{font-size:52px;font-weight:700;letter-spacing:2px;text-transform:uppercase;line-height:1;color:#fff}
+.win-name.loser{opacity:.3;font-size:32px}
+.win-center{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0}
+.win-trophy{font-size:48px;animation:flt 1s ease-in-out infinite}
+@keyframes flt{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.win-label{font-family:"Share Tech Mono",monospace;font-size:10px;letter-spacing:5px;text-transform:uppercase;color:rgba(255,255,255,.4)}
+.win-name-big{font-size:64px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gb);text-shadow:0 0 40px rgba(212,168,0,.7);animation:sh 2s ease infinite}
+@keyframes sh{0%,100%{text-shadow:0 0 40px rgba(212,168,0,.6)}50%{text-shadow:0 0 80px rgba(212,168,0,1)}}
 </style>
 </head>
 <body>
@@ -101,16 +110,24 @@ body{background:transparent;width:1920px;height:100vh;overflow:hidden;font-famil
     <div class="fi rt"><div class="ctag" style="text-align:right">Canto Azul ■</div><div class="fname" id="bN"> </div></div>
     <div class="liveb" id="liveB">■ LIVE</div>
   </div>
-</div>
-<div class="wspl" id="wSpl">
-  <div class="wside-r" id="wSideR"><div class="fi"><div class="wlbl" id="wTagR">■ Canto Vermelho</div><div class="wname" id="wNameR"> </div></div></div>
-  <div class="wcenter">
-    <div class="wtrophy">🏆</div>
-    <div class="wlabel">■ VENCEDOR ■</div>
-    <div class="wwin" id="wWin"> </div>
+  <!-- WINNER dentro da barra -->
+  <div class="win-bar" id="winBar">
+    <div class="win-side" id="wSideR">
+      <div class="win-tag r" id="wTagR">■ Canto Vermelho</div>
+      <div class="win-name" id="wNameR"> </div>
+    </div>
+    <div class="win-center">
+      <div class="win-trophy">🏆</div>
+      <div class="win-label">■ VENCEDOR ■</div>
+      <div class="win-name-big" id="wWin"> </div>
+    </div>
+    <div class="win-side rt" id="wSideB">
+      <div class="win-tag b" id="wTagB">Canto Azul ■</div>
+      <div class="win-name" id="wNameB"> </div>
+    </div>
   </div>
-  <div class="wside-b" id="wSideB"><div class="fi rt"><div class="wlbl" id="wTagB" style="text-align:right">Canto Azul ■</div><div class="wname" id="wNameB" style="text-align:right"> </div></div></div>
 </div>
+
 <div class="cov" id="cOv">
   <div class="cico">🏆</div>
   <div class="clbl">■ Campeão do Torneio ■</div>
@@ -180,13 +197,18 @@ function showWin(winner, f1, f2) {
   document.getElementById('wNameR').textContent = f1;
   document.getElementById('wNameB').textContent = f2;
   document.getElementById('wWin').textContent = winner;
-  document.getElementById('wSideR').style.opacity = isRed?'1':'0.35';
-  document.getElementById('wSideB').style.opacity = !isRed?'1':'0.35';
-  document.getElementById('wTagR').textContent = isRed?'🏆 VENCEDOR':'■ Canto Vermelho';
-  document.getElementById('wTagB').textContent = !isRed?'🏆 VENCEDOR':'Canto Azul ■';
-  document.getElementById('wSpl').classList.add('show');
+  // Vencedor em destaque, perdedor apagado
+  document.getElementById('wNameR').className = 'win-name' + (isRed ? '' : ' loser');
+  document.getElementById('wNameB').className = 'win-name' + (!isRed ? '' : ' loser');
+  document.getElementById('wTagR').textContent = isRed ? '🏆 VENCEDOR' : '■ Canto Vermelho';
+  document.getElementById('wTagR').className = 'win-tag' + (isRed ? ' trophy' : ' r');
+  document.getElementById('wTagB').textContent = !isRed ? '🏆 VENCEDOR' : 'Canto Azul ■';
+  document.getElementById('wTagB').className = 'win-tag' + (!isRed ? ' trophy' : ' b');
+  document.querySelector('.bar').classList.add('win-show');
   confetti(60);
-  wT = setTimeout(()=>document.getElementById('wSpl').classList.remove('show'), 8000);
+  wT = setTimeout(() => {
+    document.querySelector('.bar').classList.remove('win-show');
+  }, 8000);
 }
 
 function showChamp(name) {
@@ -201,6 +223,7 @@ function confetti(n) {
   for(let i=0;i<n;i++){
     const p=document.createElement('div');p.className='pt';
     p.style.left=Math.random()*1920+'px';
+    p.style.top=-20+'px';
     p.style.background=cols[Math.floor(Math.random()*cols.length)];
     const z=Math.random()*12+5;p.style.width=z+'px';p.style.height=z+'px';
     p.style.borderRadius=Math.random()>.5?'50%':'2px';
