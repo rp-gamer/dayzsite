@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>PT Boxing Stream</title>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--re:#bb2000;--bl:#1840bb;--go:#d4a800;--gb:#f0c000;}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -127,7 +126,7 @@ let currentState = null;
 const { createClient } = supabase;
 const SB_URL = 'https://xzkvpaokqbdjlsozjqut.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6a3ZwYW9rcWJkamxzb3pqcXV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzNDExMTksImV4cCI6MjA4ODkxNzExOX0.Av2vtyeQ6hpX9r_0clJWDeOFsY6h74RZ63l5-3Fw7zI';
-let supa=null, lsR=-1, lsB=-1, lastWin=null, lastChamp=null, wT=null;
+let lsR=-1, lsB=-1, lastWin=null, lastChamp=null, wT=null;
 function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
 function getM(S,id){if(!id||!S.bracket)return null;for(const r of S.bracket)for(const m of r.matches)if(m.id===id)return m;return null;}
 function render(S){
@@ -178,21 +177,18 @@ function confetti(n){
     c.appendChild(p);}
   setTimeout(()=>c.innerHTML='',6000);
 }
-function pollLocal(){const raw=localStorage.getItem('pt_state');if(raw)try{render(JSON.parse(raw));}catch(e){}}
-function initSupa(){
-  if(!SB_URL||SB_URL===''){setInterval(pollLocal,300);return;}
-  try{
-    supa=createClient(SB_URL,SB_KEY);
-    supa.from('boxing_state').select('data').eq('id','main').single()
-      .then(({data})=>{if(data?.data){localStorage.setItem('pt_state',JSON.stringify(data.data));render(data.data);}});
-    supa.channel('stream-live')
-      .on('postgres_changes',{event:'UPDATE',schema:'public',table:'boxing_state',filter:'id=eq.main'},
-        p=>{const d=p.new?.data;if(d){localStorage.setItem('pt_state',JSON.stringify(d));render(d);}})
-      .subscribe();
-  }catch(e){setInterval(pollLocal,300);}
+// Poll Supabase a cada 2 segundos — sem precisar de Realtime
+async function poll() {
+  try {
+    const r = await fetch(SB_URL + '/rest/v1/boxing_state?id=eq.main&select=data', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    const json = await r.json();
+    if (json?.[0]?.data) render(json[0].data);
+  } catch(e) {}
 }
-initSupa();
-setInterval(pollLocal,300);
+poll();
+setInterval(poll, 2000);
 <\/script>
 </body>
 </html>
