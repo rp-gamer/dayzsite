@@ -991,6 +991,25 @@ function toast(msg, type='info') {
 }
 
 init();
+  setInterval(async () => {
+  if (!db) return;
+
+  try {
+    const { data } = await db
+      .from('boxing_state')
+      .select('data')
+      .eq('id', 'main')
+      .single();
+
+    if (data?.data) {
+      applyState(data.data);
+    }
+
+  } catch (err) {
+    console.log("Auto refresh error:", err);
+  }
+
+}, 2000);
 </script>
 </body>
 </html>
