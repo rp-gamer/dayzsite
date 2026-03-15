@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PT Boxing Championship</title>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
@@ -16,7 +17,6 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--dk);color:var(--tx);font-family:'Rajdhani',sans-serif;min-height:100vh}
-
 /* HEADER */
 .hdr{height:60px;background:var(--md);border-bottom:1px solid var(--b2);display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:100}
 .hdr-l{display:flex;align-items:center;gap:12px}
@@ -24,29 +24,28 @@ body{background:var(--dk);color:var(--tx);font-family:'Rajdhani',sans-serif;min-
 .hdr-title{font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;letter-spacing:3px;color:var(--kp);text-transform:uppercase}
 .hdr-sub{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--ol);letter-spacing:2px}
 .hdr-r{display:flex;gap:8px;align-items:center}
-.btn-hdr{font-family:'Oswald',sans-serif;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:6px 12px;border:1px solid var(--b2);background:transparent;color:var(--td);cursor:pointer;border-radius:2px}
-.btn-hdr:hover{border-color:var(--ol);color:var(--kp)}
-.btn-hdr.admin{border-color:rgba(139,69,19,.5);color:#c06030}
-.live-badge{display:none;align-items:center;gap:5px;padding:2px 8px;border:1px solid rgba(200,0,0,.5);background:rgba(200,0,0,.1);border-radius:2px;font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;color:#ff4422}
+.hbtn{font-family:'Oswald',sans-serif;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:6px 12px;border:1px solid var(--b2);background:transparent;color:var(--td);cursor:pointer;border-radius:2px}
+.hbtn:hover{border-color:var(--ol);color:var(--kp)}
+.hbtn.adm{border-color:rgba(139,69,19,.5);color:#c06030}
+.live-badge{display:none;align-items:center;gap:5px;padding:2px 8px;border:1px solid rgba(200,0,0,.5);background:rgba(200,0,0,.08);border-radius:2px;font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;color:#ff4422}
 .live-badge span{width:5px;height:5px;border-radius:50%;background:#ff4422;animation:blink 1s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-
-/* LAYOUT */
+.db-dot{width:8px;height:8px;border-radius:50%;background:var(--td);cursor:help;flex-shrink:0}
+.db-dot.ok{background:#55aa66}.db-dot.err{background:#cc3333}
+/* PAGE */
 .page{max-width:1000px;margin:0 auto;padding:20px 16px 60px}
-.section-title{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--td);display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.section-title::after{content:'';flex:1;height:1px;background:var(--bd)}
-
+.sec{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--td);display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.sec::after{content:'';flex:1;height:1px;background:var(--bd)}
 /* STATS */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px}
 .stat{background:var(--su);border:1px solid var(--bd);border-radius:3px;padding:12px;text-align:center}
 .stat-v{font-family:'Oswald',sans-serif;font-size:26px;font-weight:700;color:var(--gb)}
 .stat-l{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--td);margin-top:2px;text-transform:uppercase}
 @media(max-width:480px){.stats{grid-template-columns:repeat(2,1fr)}}
-
 /* FIGHT CARD */
 .fight-card{background:var(--su);border:1px solid var(--b2);border-radius:4px;overflow:hidden;margin-bottom:22px;position:relative}
 .fight-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--re),var(--go),var(--bl))}
-.fc-header{background:var(--s2);border-bottom:1px solid var(--bd);padding:9px 16px;display:flex;justify-content:space-between;align-items:center}
+.fc-hdr{background:var(--s2);border-bottom:1px solid var(--bd);padding:9px 16px;display:flex;justify-content:space-between;align-items:center}
 .fc-round{font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;letter-spacing:3px;color:var(--go);text-transform:uppercase}
 .fc-body{display:grid;grid-template-columns:1fr 160px 1fr}
 @media(max-width:520px){.fc-body{display:flex;flex-direction:column}}
@@ -54,167 +53,141 @@ body{background:var(--dk);color:var(--tx);font-family:'Rajdhani',sans-serif;min-
 .fc-red{background:linear-gradient(90deg,rgba(100,0,0,.15),transparent);border-right:1px solid rgba(100,0,0,.2)}
 .fc-blue{background:linear-gradient(270deg,rgba(0,30,120,.15),transparent);border-left:1px solid rgba(0,30,120,.2);text-align:right}
 .fc-corner{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;margin-bottom:4px}
-.fc-red .fc-corner{color:rgba(200,80,60,.8)}
-.fc-blue .fc-corner{color:rgba(70,110,210,.8)}
+.fc-red .fc-corner{color:rgba(200,80,60,.8)}.fc-blue .fc-corner{color:rgba(70,110,210,.8)}
 .fc-name{font-family:'Oswald',sans-serif;font-size:clamp(15px,2.5vw,24px);font-weight:700;text-transform:uppercase;color:var(--kp);letter-spacing:1px}
 .fc-cat{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--td);margin-top:3px}
 .fc-center{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:14px 8px;border-left:1px solid var(--bd);border-right:1px solid var(--bd);background:rgba(0,0,0,.15)}
 .scores{display:flex;align-items:center;gap:4px}
 .score{font-family:'Oswald',sans-serif;font-size:52px;font-weight:700;min-width:52px;text-align:center;line-height:1}
-.score-r{color:var(--re);text-shadow:0 0 16px rgba(187,32,0,.5)}
-.score-b{color:var(--bl);text-shadow:0 0 16px rgba(24,64,187,.5)}
+.score-r{color:var(--re);text-shadow:0 0 16px rgba(187,32,0,.5)}.score-b{color:var(--bl);text-shadow:0 0 16px rgba(24,64,187,.5)}
 .score-sep{font-family:'Oswald',sans-serif;font-size:22px;color:rgba(200,184,130,.15)}
-.timer{font-family:'Share Tech Mono',monospace;font-size:20px;letter-spacing:4px;color:var(--gb);background:rgba(212,168,0,.07);border:1px solid rgba(212,168,0,.2);border-radius:2px;padding:3px 10px;text-align:center}
-.timer.danger{color:#ff3300;border-color:rgba(255,51,0,.4);animation:td .5s infinite}
-@keyframes td{0%,100%{opacity:1}50%{opacity:.4}}
-.rounds{display:flex;gap:5px}
-.round-pip{width:20px;height:20px;border-radius:2px;border:1px solid rgba(200,184,130,.18);display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(200,184,130,.2)}
-.round-pip.active{border-color:var(--go);color:var(--go);background:rgba(212,168,0,.1)}
-.round-pip.done{border-color:rgba(200,184,130,.35);background:rgba(200,184,130,.08);color:var(--kh)}
+.tmr{font-family:'Share Tech Mono',monospace;font-size:20px;letter-spacing:4px;color:var(--gb);background:rgba(212,168,0,.07);border:1px solid rgba(212,168,0,.2);border-radius:2px;padding:3px 10px;text-align:center}
+.tmr.danger{color:#ff3300;border-color:rgba(255,51,0,.4);animation:tda .5s infinite}
+@keyframes tda{0%,100%{opacity:1}50%{opacity:.4}}
+.rpips{display:flex;gap:5px}
+.rp{width:20px;height:20px;border-radius:2px;border:1px solid rgba(200,184,130,.18);display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(200,184,130,.2)}
+.rp.act{border-color:var(--go);color:var(--go);background:rgba(212,168,0,.1)}
+.rp.dn{border-color:rgba(200,184,130,.35);background:rgba(200,184,130,.08);color:var(--kh)}
 .fc-winner{background:rgba(212,168,0,.07);border-top:1px solid rgba(212,168,0,.2);padding:8px 16px;text-align:center;display:none}
 .fc-winner.show{display:block}
 .fc-winner-l{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;color:var(--go)}
 .fc-winner-n{font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;color:var(--gb);letter-spacing:2px;margin-top:2px}
-
-/* NO MATCH */
 .no-match{background:var(--su);border:1px solid var(--bd);border-radius:4px;padding:40px;text-align:center;margin-bottom:22px}
-.no-match-icon{font-size:28px;opacity:.3;margin-bottom:8px}
-.no-match-t{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--td);text-transform:uppercase}
-
+.no-match-t{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--td);text-transform:uppercase;margin-top:8px}
 /* SCHEDULE */
 .schedule{background:var(--su);border:1px solid var(--bd);border-radius:4px;overflow:hidden;margin-bottom:22px}
-.sched-row{display:grid;grid-template-columns:100px 1fr 1fr 80px;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--bd);font-size:12px}
-.sched-row:last-child{border-bottom:none}
-.sched-row.current{background:rgba(212,168,0,.04);border-left:2px solid var(--go)}
-.sched-time{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--td)}
-.sched-red{color:rgba(200,80,60,1);font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:1px}
-.sched-blue{color:rgba(70,110,210,1);font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:1px}
+.srow{display:grid;grid-template-columns:100px 1fr 1fr 80px;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--bd);font-size:12px}
+.srow:last-child{border-bottom:none}
+.srow.cur{background:rgba(212,168,0,.04);border-left:2px solid var(--go)}
+.srow-time{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--td)}
+.srow-r{color:rgba(200,80,60,1);font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:1px}
+.srow-b{color:rgba(70,110,210,1);font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:1px}
 .badge{display:inline-flex;padding:1px 7px;border:1px solid;border-radius:2px;font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:2px;text-transform:uppercase}
-.badge-live{border-color:rgba(200,0,0,.5);color:#ff4422;background:rgba(200,0,0,.08)}
-.badge-done{border-color:rgba(74,90,46,.5);color:var(--ol)}
-.badge-wait{border-color:var(--bd);color:var(--td)}
-
+.b-live{border-color:rgba(200,0,0,.5);color:#ff4422}.b-done{border-color:rgba(74,90,46,.5);color:var(--ol)}.b-wait{border-color:var(--bd);color:var(--td)}
 /* BRACKET */
-.bracket-wrap{overflow-x:auto;margin-bottom:22px}
-.bracket-inner{display:flex;gap:16px;min-width:max-content;padding:4px 0}
-.bracket-col{min-width:160px}
-.bracket-col-title{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--td);margin-bottom:8px;text-align:center}
-.bracket-matches{display:flex;flex-direction:column;gap:7px}
-.bracket-match{background:var(--su);border:1px solid var(--bd);border-radius:3px;overflow:hidden}
-.bracket-match.current{border-color:var(--go)}
-.bracket-match.done{opacity:.6}
-.bracket-fighter{padding:5px 8px;font-size:11px;font-family:'Rajdhani',sans-serif;font-weight:600;display:flex;justify-content:space-between;border-left:2px solid transparent}
-.bracket-fighter.red{border-left-color:rgba(139,0,0,.5)}
-.bracket-fighter.blue{border-left-color:rgba(26,68,187,.5)}
-.bracket-fighter.winner{background:rgba(212,168,0,.07);color:var(--go)}
-.bracket-divider{height:1px;background:var(--bd)}
-.bracket-score{font-family:'Share Tech Mono',monospace;font-size:9px;opacity:.6}
-
+.bkt-wrap{overflow-x:auto;margin-bottom:22px}
+.bkt-inner{display:flex;gap:16px;min-width:max-content;padding:4px 0}
+.bkt-col{min-width:155px}
+.bkt-col-t{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--td);margin-bottom:8px;text-align:center}
+.bkt-matches{display:flex;flex-direction:column;gap:7px}
+.bkt-match{background:var(--su);border:1px solid var(--bd);border-radius:3px;overflow:hidden}
+.bkt-match.cur{border-color:var(--go)}.bkt-match.done{opacity:.6}
+.bkt-f{padding:5px 8px;font-size:11px;font-family:'Rajdhani',sans-serif;font-weight:600;display:flex;justify-content:space-between;border-left:2px solid transparent}
+.bkt-f.r{border-left-color:rgba(139,0,0,.5)}.bkt-f.b{border-left-color:rgba(26,68,187,.5)}
+.bkt-f.win{background:rgba(212,168,0,.07);color:var(--go)}
+.bkt-div{height:1px;background:var(--bd)}
+.bkt-sc{font-family:'Share Tech Mono',monospace;font-size:9px;opacity:.6}
 /* CHAMPION */
-.champion{text-align:center;padding:36px 20px;display:none}
-.champion.show{display:block}
-.champion-icon{font-size:44px;animation:float 3s ease-in-out infinite}
+.champ{text-align:center;padding:36px 20px;display:none}
+.champ.show{display:block}
+.champ-icon{font-size:44px;animation:float 3s ease-in-out infinite}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.champion-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:5px;color:var(--td);margin:10px 0 4px;text-transform:uppercase}
-.champion-name{font-family:'Oswald',sans-serif;font-size:clamp(28px,6vw,60px);font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gb);text-shadow:0 0 40px rgba(212,168,0,.4)}
-
-/* ── ADMIN ── */
-.admin-layout{display:none}
-.admin-layout.show{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 60px)}
-@media(max-width:700px){.admin-layout.show{grid-template-columns:1fr}}
-.admin-side{background:var(--md);border-right:1px solid var(--bd);padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
-.admin-main{padding:18px;overflow-y:auto}
-.panel-title{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--td);display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.panel-title::after{content:'';flex:1;height:1px;background:var(--bd)}
-.field{margin-bottom:8px}
-.field label{display:block;font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin-bottom:3px}
-.field input,.field select{width:100%;background:var(--s2);border:1px solid var(--b2);color:var(--tx);font-family:'Rajdhani',sans-serif;font-size:13px;padding:7px 9px;border-radius:2px;outline:none}
-.field input:focus,.field select:focus{border-color:var(--ol)}
-.btn{font-family:'Oswald',sans-serif;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:7px 14px;border:none;border-radius:2px;cursor:pointer;width:100%;margin-bottom:5px}
-.btn-green{background:var(--o);color:var(--kp)}.btn-green:hover{background:var(--ol)}
+.champ-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:5px;color:var(--td);margin:10px 0 4px;text-transform:uppercase}
+.champ-nm{font-family:'Oswald',sans-serif;font-size:clamp(28px,6vw,60px);font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gb);text-shadow:0 0 40px rgba(212,168,0,.4)}
+/* ADMIN */
+.adm-layout{display:none}
+.adm-layout.show{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 60px)}
+@media(max-width:700px){.adm-layout.show{grid-template-columns:1fr}}
+.adm-side{background:var(--md);border-right:1px solid var(--bd);padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+.adm-side::-webkit-scrollbar{width:3px}.adm-side::-webkit-scrollbar-thumb{background:var(--b2)}
+.adm-main{padding:18px;overflow-y:auto}
+.pt{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--td);display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.pt::after{content:'';flex:1;height:1px;background:var(--bd)}
+.fld{margin-bottom:8px}
+.fld label{display:block;font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin-bottom:3px}
+.fld input,.fld select{width:100%;background:var(--s2);border:1px solid var(--b2);color:var(--tx);font-family:'Rajdhani',sans-serif;font-size:13px;padding:7px 9px;border-radius:2px;outline:none}
+.fld input:focus,.fld select:focus{border-color:var(--ol)}
+.btn{font-family:'Oswald',sans-serif;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:7px 14px;border:none;border-radius:2px;cursor:pointer;width:100%;margin-bottom:5px;display:block;text-align:center}
+.btn-g{background:var(--o);color:var(--kp)}.btn-g:hover{background:var(--ol)}
 .btn-gold{background:var(--go);color:#1a1200}.btn-gold:hover{background:var(--gb)}
-.btn-outline{background:transparent;border:1px solid var(--b2);color:var(--td)}.btn-outline:hover{border-color:var(--kh);color:var(--tx)}
-.btn-danger{background:rgba(100,0,0,.3);border:1px solid rgba(139,0,0,.5);color:#ff4422}.btn-danger:hover{background:rgba(139,0,0,.5)}
-.fighter-list{max-height:200px;overflow-y:auto}
-.fighter-item{background:var(--su);border:1px solid var(--bd);border-radius:3px;padding:6px 9px;display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:12px}
-.fighter-name{flex:1;font-weight:600}
-.fighter-cat{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--td);background:rgba(200,184,130,.06);padding:1px 4px;border-radius:2px}
-.db-status{font-family:'Share Tech Mono',monospace;font-size:9px;padding:6px 9px;border-radius:2px;border:1px solid;margin-bottom:6px}
+.btn-o{background:transparent;border:1px solid var(--b2);color:var(--td)}.btn-o:hover{border-color:var(--kh);color:var(--tx)}
+.btn-d{background:rgba(100,0,0,.3);border:1px solid rgba(139,0,0,.5);color:#ff4422}
+.fl{max-height:200px;overflow-y:auto}.fl::-webkit-scrollbar{width:3px}.fl::-webkit-scrollbar-thumb{background:var(--b2)}
+.fi{background:var(--su);border:1px solid var(--bd);border-radius:3px;padding:6px 9px;display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:12px}
+.fi-n{flex:1;font-weight:600}
+.fi-c{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--td);background:rgba(200,184,130,.06);padding:1px 4px;border-radius:2px}
+.db-box{font-family:'Share Tech Mono',monospace;font-size:9px;padding:7px 9px;border-radius:2px;border:1px solid;margin-bottom:6px}
 .db-ok{border-color:rgba(74,90,46,.5);background:rgba(74,90,46,.1);color:var(--ol)}
 .db-err{border-color:rgba(139,0,0,.4);background:rgba(139,0,0,.1);color:#ff4422}
 .db-na{border-color:var(--bd);color:var(--td)}
-
 /* TABS */
 .tabs{display:flex;border-bottom:1px solid var(--bd);margin-bottom:14px}
 .tab{padding:7px 14px;background:none;border:none;border-bottom:2px solid transparent;color:var(--td);font-family:'Oswald',sans-serif;font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-bottom:-1px}
 .tab:hover{color:var(--tx)}.tab.active{color:var(--go);border-bottom-color:var(--go)}
-.tab-panel{display:none}.tab-panel.active{display:block}
-
+.tab-p{display:none}.tab-p.active{display:block}
 /* MATCH CONTROL */
-.match-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:6px;margin-bottom:12px}
-.match-card{background:var(--su);border:1px solid var(--bd);border-radius:3px;padding:8px;cursor:pointer;font-size:11px}
-.match-card:hover{border-color:var(--b2)}.match-card.selected{border-color:var(--go)}
-.match-card.done{opacity:.5}
-.match-card-round{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--td);margin-bottom:3px;text-transform:uppercase}
-.match-card-names{font-weight:600;line-height:1.6}
-.ctrl-box{background:var(--su);border:1px solid var(--b2);border-radius:4px;padding:16px;margin-bottom:14px;position:relative}
-.ctrl-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--re),var(--go),var(--bl))}
-.vs-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-bottom:14px}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-bottom:12px}
+.mc{background:var(--su);border:1px solid var(--bd);border-radius:3px;padding:8px;cursor:pointer;font-size:11px}
+.mc:hover{border-color:var(--b2)}.mc.sel{border-color:var(--go)}.mc.done{opacity:.5}
+.mc-r{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--td);margin-bottom:3px;text-transform:uppercase}
+.ctrl{background:var(--su);border:1px solid var(--b2);border-radius:4px;padding:16px;margin-bottom:14px;position:relative}
+.ctrl::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--re),var(--go),var(--bl))}
+.vs-g{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-bottom:14px}
 .vs-box{border-radius:3px;padding:10px;text-align:center}
-.vs-red{background:rgba(100,0,0,.12);border:1px solid rgba(100,0,0,.25)}
-.vs-blue{background:rgba(20,50,160,.12);border:1px solid rgba(20,50,160,.25)}
-.vs-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
-.vs-red .vs-label{color:rgba(200,80,60,.8)}.vs-blue .vs-label{color:rgba(70,110,210,.8)}
-.vs-name{font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;color:var(--kp)}
+.vs-r{background:rgba(100,0,0,.12);border:1px solid rgba(100,0,0,.25)}.vs-b{background:rgba(20,50,160,.12);border:1px solid rgba(20,50,160,.25)}
+.vs-lbl{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.vs-r .vs-lbl{color:rgba(200,80,60,.8)}.vs-b .vs-lbl{color:rgba(70,110,210,.8)}
+.vs-nm{font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;color:var(--kp)}
 .vs-sep{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;color:var(--go);text-align:center}
-.round-dots{display:flex;justify-content:center;gap:8px;margin-bottom:12px}
-.round-dot{width:32px;height:32px;border-radius:2px;border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--td);cursor:pointer}
-.round-dot.active{border-color:var(--go);background:rgba(212,168,0,.1);color:var(--go)}
-.round-dot.done{border-color:rgba(200,184,130,.3);background:rgba(200,184,130,.06);color:var(--kh)}
-.timer-row{display:flex;align-items:center;justify-content:center;gap:10px;background:rgba(0,0,0,.18);border-radius:3px;padding:10px;margin-bottom:10px}
-.timer-big{font-family:'Share Tech Mono',monospace;font-size:44px;letter-spacing:5px;color:var(--gb);min-width:130px;text-align:center}
-.timer-big.danger{color:#ff3300;animation:td .5s infinite}
-.timer-btn{width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
-.tbtn-start{background:#386020;color:#fff}.tbtn-start:hover{background:#46782a}
-.tbtn-pause{background:var(--go);color:#1a1200;display:none}.tbtn-pause:hover{background:var(--gb)}
-.tbtn-reset{background:var(--s2);border:1px solid var(--b2);color:var(--td)}
-.score-row{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;background:rgba(0,0,0,.12);border-radius:3px;padding:10px;margin-bottom:10px}
-.score-side{display:flex;align-items:center;gap:5px}
-.score-side.right{flex-direction:row-reverse}
-.score-adj{width:30px;height:30px;border-radius:2px;border:none;cursor:pointer;font-size:14px;font-weight:700}
-.sadj-rp{background:var(--re);color:#fff}.sadj-rm{background:rgba(100,0,0,.18);border:1px solid rgba(100,0,0,.4);color:#cc4422}
-.sadj-bp{background:var(--bl);color:#fff}.sadj-bm{background:rgba(0,30,100,.18);border:1px solid rgba(0,30,100,.4);color:#4488cc}
-.score-big{font-family:'Oswald',sans-serif;font-size:40px;font-weight:700;min-width:32px;text-align:center}
-.score-big.red{color:var(--re)}.score-big.blue{color:var(--bl)}
-.score-vs{font-family:'Oswald',sans-serif;font-size:15px;color:var(--b2)}
-
+.rdots{display:flex;justify-content:center;gap:8px;margin-bottom:12px}
+.rdot{width:32px;height:32px;border-radius:2px;border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--td);cursor:pointer}
+.rdot.act{border-color:var(--go);background:rgba(212,168,0,.1);color:var(--go)}.rdot.dn{border-color:rgba(200,184,130,.3);background:rgba(200,184,130,.06);color:var(--kh)}
+.tmr-row{display:flex;align-items:center;justify-content:center;gap:10px;background:rgba(0,0,0,.18);border-radius:3px;padding:10px;margin-bottom:10px}
+.tmr-big{font-family:'Share Tech Mono',monospace;font-size:44px;letter-spacing:5px;color:var(--gb);min-width:130px;text-align:center}
+.tmr-big.danger{color:#ff3300;animation:tda .5s infinite}
+.tbtn{width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+.tb-s{background:#386020;color:#fff}.tb-p{background:var(--go);color:#1a1200;display:none}.tb-r{background:var(--s2);border:1px solid var(--b2);color:var(--td)}
+.sc-row{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;background:rgba(0,0,0,.12);border-radius:3px;padding:10px;margin-bottom:10px}
+.sc-side{display:flex;align-items:center;gap:5px}.sc-side.rt{flex-direction:row-reverse}
+.sadj{width:30px;height:30px;border-radius:2px;border:none;cursor:pointer;font-size:14px;font-weight:700}
+.sa-rp{background:var(--re);color:#fff}.sa-rm{background:rgba(100,0,0,.18);border:1px solid rgba(100,0,0,.4);color:#cc4422}
+.sa-bp{background:var(--bl);color:#fff}.sa-bm{background:rgba(0,30,100,.18);border:1px solid rgba(0,30,100,.4);color:#4488cc}
+.sc-big{font-family:'Oswald',sans-serif;font-size:40px;font-weight:700;min-width:32px;text-align:center}
+.sc-big.r{color:var(--re)}.sc-big.b{color:var(--bl)}
+.sc-vs{font-family:'Oswald',sans-serif;font-size:15px;color:var(--b2)}
 /* SCHED EDIT */
-.sched-edit-row{display:flex;align-items:center;gap:8px;padding:8px;background:var(--s2);border:1px solid var(--bd);border-radius:3px;margin-bottom:5px;flex-wrap:wrap}
-.sched-edit-name{flex:1;font-size:11px;font-weight:600;min-width:100px}
-.sched-input{background:var(--s2);border:1px solid var(--b2);color:var(--tx);padding:5px 7px;border-radius:2px;font-family:'Rajdhani',sans-serif;font-size:12px}
-
-/* TOUCHPORTAL */
+.se-row{display:flex;align-items:center;gap:8px;padding:8px;background:var(--s2);border:1px solid var(--bd);border-radius:3px;margin-bottom:5px;flex-wrap:wrap}
+.se-nm{flex:1;font-size:11px;font-weight:600;min-width:100px}
+.si{background:var(--s2);border:1px solid var(--b2);color:var(--tx);padding:5px 7px;border-radius:2px;font-family:'Rajdhani',sans-serif;font-size:12px}
+/* TP */
 .tp-code{font-family:'Share Tech Mono',monospace;font-size:10px;background:var(--s2);border:1px solid var(--b2);border-radius:2px;padding:6px 9px;color:var(--go);display:block;margin:2px 0 9px;word-break:break-all;line-height:1.7}
-
 /* MODAL */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:500;display:none;align-items:center;justify-content:center}
 .modal.show{display:flex}
 .modal-box{background:var(--su);border:1px solid var(--b2);border-radius:4px;padding:28px;width:min(380px,95vw);text-align:center}
-.modal-title{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gb);margin-bottom:4px}
-.modal-sub{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--td);letter-spacing:2px;margin-bottom:18px}
-.winner-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px}
-.winner-btn{padding:10px 4px;border-radius:3px;cursor:pointer;border:2px solid;font-family:'Oswald',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:transparent}
-.wbtn-red{border-color:rgba(139,0,0,.7);color:#cc2200}.wbtn-red:hover{background:var(--re);color:#fff}
-.wbtn-blue{border-color:rgba(26,68,187,.7);color:#5588dd}.wbtn-blue:hover{background:var(--bl);color:#fff}
-.wbtn-draw{border-color:rgba(212,168,0,.4);color:var(--go)}.wbtn-draw:hover{background:rgba(212,168,0,.15)}
-
+.modal-t{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gb);margin-bottom:4px}
+.modal-s{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--td);letter-spacing:2px;margin-bottom:18px}
+.w-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px}
+.wbtn{padding:10px 4px;border-radius:3px;cursor:pointer;border:2px solid;font-family:'Oswald',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:transparent}
+.wb-r{border-color:rgba(139,0,0,.7);color:#cc2200}.wb-r:hover{background:var(--re);color:#fff}
+.wb-b{border-color:rgba(26,68,187,.7);color:#5588dd}.wb-b:hover{background:var(--bl);color:#fff}
+.wb-d{border-color:rgba(212,168,0,.4);color:var(--go)}.wb-d:hover{background:rgba(212,168,0,.15)}
 /* TOAST */
-.toast{position:fixed;bottom:18px;right:18px;background:var(--s2);border:1px solid var(--b2);border-radius:3px;padding:9px 14px;font-size:13px;z-index:999;transform:translateY(60px);opacity:0;transition:all .3s;max-width:260px}
+.toast{position:fixed;bottom:18px;right:18px;background:var(--s2);border:1px solid var(--b2);border-radius:3px;padding:9px 14px;font-size:13px;z-index:9999;transform:translateY(60px);opacity:0;transition:all .3s;max-width:260px}
 .toast.show{transform:translateY(0);opacity:1}
 .toast.ok{border-color:var(--ol)}.toast.err{border-color:#cc2200}.toast.info{border-color:var(--go)}
-
-@keyframes scoreFlash{0%{transform:scale(1)}30%{transform:scale(1.35)}100%{transform:scale(1)}}
-.flash{animation:scoreFlash .35s ease}
+@keyframes flash{0%{transform:scale(1)}30%{transform:scale(1.35)}100%{transform:scale(1)}}
+.flash{animation:flash .35s ease}
 </style>
 </head>
 <body>
@@ -222,15 +195,13 @@ body{background:var(--dk);color:var(--tx);font-family:'Rajdhani',sans-serif;min-
 <header class="hdr">
   <div class="hdr-l">
     <img src="data:image/png;base64,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" alt="PT">
-    <div>
-      <div class="hdr-title" id="siteTitle">PT BOXING</div>
-      <div class="hdr-sub">■ CHAMPIONSHIP LIVE</div>
-    </div>
+    <div><div class="hdr-title" id="siteTitle">PT BOXING</div><div class="hdr-sub">■ CHAMPIONSHIP LIVE</div></div>
   </div>
   <div class="hdr-r">
     <div class="live-badge" id="liveBadge"><span></span>LIVE</div>
-    <button class="btn-hdr" onclick="showViewer()">■ Bracket</button>
-    <button class="btn-hdr admin" onclick="adminLogin()">⚙ Admin</button>
+    <div class="db-dot" id="dbDot" title="Base de dados"></div>
+    <button class="hbtn" onclick="showViewer()">■ Bracket</button>
+    <button class="hbtn adm" onclick="adminLogin()">⚙ Admin</button>
   </div>
 </header>
 
@@ -243,225 +214,177 @@ body{background:var(--dk);color:var(--tx);font-family:'Rajdhani',sans-serif;min-
     <div class="stat"><div class="stat-v" id="statD">0</div><div class="stat-l">Concluídos</div></div>
     <div class="stat"><div class="stat-v" id="statR">—</div><div class="stat-l">Fase</div></div>
   </div>
-
-  <div class="section-title">Combate em Curso</div>
-  <div class="no-match" id="noMatch"><div class="no-match-icon">⚔️</div><div class="no-match-t">A aguardar início do combate</div></div>
+  <div class="sec">Combate em Curso</div>
+  <div class="no-match" id="noMatch"><div style="font-size:28px;opacity:.3">⚔️</div><div class="no-match-t">A aguardar início do combate</div></div>
   <div class="fight-card" id="fightCard" style="display:none">
-    <div class="fc-header">
+    <div class="fc-hdr">
       <div class="fc-round" id="vRound">FINAL</div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--td);display:flex;gap:10px"><span id="vDate">—</span><span id="vTime">—</span></div>
     </div>
     <div class="fc-body">
-      <div class="fc-fighter fc-red">
-        <div class="fc-corner">■ Canto Vermelho</div>
-        <div class="fc-name" id="vRed">—</div>
-        <div class="fc-cat" id="vRedCat"></div>
-      </div>
+      <div class="fc-fighter fc-red"><div class="fc-corner">■ Canto Vermelho</div><div class="fc-name" id="vRed">—</div><div class="fc-cat" id="vRedCat"></div></div>
       <div class="fc-center">
-        <div class="scores">
-          <div class="score score-r" id="vScoreR">0</div>
-          <div class="score-sep">:</div>
-          <div class="score score-b" id="vScoreB">0</div>
-        </div>
-        <div class="timer" id="vTimer">3:00</div>
-        <div class="rounds">
-          <div class="round-pip" id="vPip1">1</div>
-          <div class="round-pip" id="vPip2">2</div>
-          <div class="round-pip" id="vPip3">3</div>
-        </div>
+        <div class="scores"><div class="score score-r" id="vSR">0</div><div class="score-sep">:</div><div class="score score-b" id="vSB">0</div></div>
+        <div class="tmr" id="vTimer">3:00</div>
+        <div class="rpips"><div class="rp" id="vP1">1</div><div class="rp" id="vP2">2</div><div class="rp" id="vP3">3</div></div>
       </div>
-      <div class="fc-fighter fc-blue">
-        <div class="fc-corner" style="text-align:right">Canto Azul ■</div>
-        <div class="fc-name" id="vBlue" style="text-align:right">—</div>
-        <div class="fc-cat" id="vBlueCat" style="text-align:right"></div>
-      </div>
+      <div class="fc-fighter fc-blue"><div class="fc-corner" style="text-align:right">Canto Azul ■</div><div class="fc-name" id="vBlue" style="text-align:right">—</div><div class="fc-cat" id="vBlueCat" style="text-align:right"></div></div>
     </div>
     <div class="fc-winner" id="vWinner"><div class="fc-winner-l">⚔ Vencedor</div><div class="fc-winner-n" id="vWinnerName"></div></div>
   </div>
-
-  <div class="section-title">Calendário</div>
-  <div class="schedule" id="scheduleView"><div style="padding:24px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--td)">SEM COMBATES AGENDADOS</div></div>
-
-  <div class="champion" id="championSection">
-    <div class="champion-icon">🏆</div>
-    <div class="champion-label">■ Campeão do Torneio ■</div>
-    <div class="champion-name" id="championName"></div>
-  </div>
-
-  <div class="section-title">Bracket</div>
-  <div class="bracket-wrap"><div class="bracket-inner" id="bracketView"><div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--td);letter-spacing:3px">SEM BRACKET</div></div></div>
+  <div class="sec">Calendário</div>
+  <div class="schedule" id="schedView"><div style="padding:24px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--td)">SEM COMBATES</div></div>
+  <div class="champ" id="champSec"><div class="champ-icon">🏆</div><div class="champ-lbl">■ Campeão ■</div><div class="champ-nm" id="champNm"></div></div>
+  <div class="sec">Bracket</div>
+  <div class="bkt-wrap"><div class="bkt-inner" id="bktView"><div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--td);letter-spacing:3px">SEM BRACKET</div></div></div>
 </div>
 </div>
 
 <!-- ADMIN -->
-<div class="admin-layout" id="adminPage">
-  <div class="admin-side">
+<div class="adm-layout" id="adminPage">
+  <div class="adm-side">
     <div>
-      <div class="panel-title">Lutadores</div>
-      <div class="field"><label>Nome</label><input id="fighterName" placeholder="Nome do lutador" maxlength="22"></div>
-      <div class="field"><label>Categoria</label>
-        <select id="fighterCat">
+      <div class="pt">Lutadores</div>
+      <div class="fld"><label>Nome</label><input id="fName" placeholder="Nome do lutador" maxlength="22"></div>
+      <div class="fld"><label>Categoria</label>
+        <select id="fCat">
           <option>Peso Galo (-54kg)</option><option>Peso Leve (-60kg)</option>
           <option>Peso Welter (-67kg)</option><option>Peso Médio (-75kg)</option>
           <option selected>Peso Pesado (+91kg)</option><option>Open</option>
         </select>
       </div>
-      <button class="btn btn-green" onclick="addFighter()">+ Adicionar Lutador</button>
-      <div class="fighter-list" id="fighterList"></div>
+      <button class="btn btn-g" onclick="addFighter()">+ Adicionar</button>
+      <div class="fl" id="fighterList"></div>
     </div>
     <div>
-      <div class="panel-title">Configuração</div>
-      <div class="field"><label>Nome do Campeonato</label><input id="champNameInput" value="PT BOXING CHAMPIONSHIP"></div>
+      <div class="pt">Configuração</div>
+      <div class="fld"><label>Nome do Campeonato</label><input id="champInput" value="PT BOXING CHAMPIONSHIP"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <div class="field"><label>Round (seg)</label><input type="number" id="roundDurInput" value="180" min="30" max="600"></div>
-        <div class="field"><label>PIN admin</label><input type="password" id="pinInput" placeholder="Alterar PIN"></div>
+        <div class="fld"><label>Round (seg)</label><input type="number" id="roundDur" value="180" min="30" max="600"></div>
+        <div class="fld"><label>PIN admin</label><input type="password" id="pinInput" placeholder="Alterar"></div>
       </div>
       <button class="btn btn-gold" onclick="generateBracket()">⚡ Gerar Bracket</button>
-      <button class="btn btn-green" onclick="saveAndSync()">☁ Guardar &amp; Sync</button>
-      <button class="btn btn-danger" onclick="resetAll()">↺ Reset Total</button>
+      <button class="btn btn-g" onclick="forceSave()">☁ Guardar &amp; Sync</button>
+      <button class="btn btn-d" onclick="resetAll()">↺ Reset Total</button>
     </div>
     <div>
-      <div class="panel-title">Base de Dados</div>
-      <div class="db-status db-na" id="dbStatus">◌ A ligar...</div>
+      <div class="pt">Base de Dados</div>
+      <div class="db-box db-na" id="dbStatus">◌ A ligar...</div>
     </div>
-    <button class="btn btn-outline" onclick="showViewer()">← Ver Público</button>
+    <button class="btn btn-o" onclick="showViewer()">← Ver Público</button>
   </div>
-  <div class="admin-main">
-    <div id="champCard" style="display:none;background:linear-gradient(135deg,rgba(212,168,0,.08),transparent);border:1px solid rgba(212,168,0,.3);border-radius:4px;padding:16px;text-align:center;margin-bottom:14px">
+  <div class="adm-main">
+    <div id="champCard" style="display:none;background:linear-gradient(135deg,rgba(212,168,0,.08),transparent);border:1px solid rgba(212,168,0,.3);border-radius:4px;padding:14px;text-align:center;margin-bottom:14px">
       <div style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;color:var(--go)">CAMPEÃO</div>
-      <div style="font-family:'Oswald',sans-serif;font-size:28px;font-weight:700;color:var(--gb);letter-spacing:3px;text-transform:uppercase;margin-top:3px" id="champCardName"></div>
+      <div style="font-family:'Oswald',sans-serif;font-size:26px;font-weight:700;color:var(--gb);letter-spacing:3px;text-transform:uppercase;margin-top:3px" id="champCardNm"></div>
     </div>
     <div class="tabs">
-      <button class="tab active" onclick="switchTab('control')">⚔ Controlo</button>
-      <button class="tab" onclick="switchTab('bracket')">🏆 Bracket</button>
-      <button class="tab" onclick="switchTab('schedule')">📅 Calendário</button>
+      <button class="tab active" onclick="switchTab('ctrl')">⚔ Controlo</button>
+      <button class="tab" onclick="switchTab('bkt')">🏆 Bracket</button>
+      <button class="tab" onclick="switchTab('sch')">📅 Calendário</button>
       <button class="tab" onclick="switchTab('tp')">📱 TouchPortal</button>
     </div>
-
-    <!-- CONTROLO -->
-    <div class="tab-panel active" id="tab-control">
+    <div class="tab-p active" id="tab-ctrl">
       <div style="background:var(--su);border:1px solid var(--bd);border-radius:4px;padding:14px;margin-bottom:12px">
         <div style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;color:var(--td);margin-bottom:9px">SELECIONAR COMBATE</div>
-        <div class="match-grid" id="matchGrid"><div style="color:var(--td);font-family:'Share Tech Mono',monospace;font-size:9px">Gera o bracket primeiro</div></div>
+        <div class="mgrid" id="matchGrid"><div style="color:var(--td);font-family:'Share Tech Mono',monospace;font-size:9px">Gera o bracket primeiro</div></div>
       </div>
-      <div class="ctrl-box">
+      <div class="ctrl">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-          <div style="font-size:11px;color:var(--td)" id="matchLabel">Nenhum combate seleccionado</div>
-          <div class="badge badge-wait" id="matchBadge">Espera</div>
+          <div style="font-size:11px;color:var(--td)" id="matchLabel">Nenhum combate</div>
+          <div class="badge b-wait" id="matchBadge">Espera</div>
         </div>
-        <div class="vs-grid">
-          <div class="vs-box vs-red"><div class="vs-label">■ Vermelho</div><div class="vs-name" id="aRed">—</div></div>
+        <div class="vs-g">
+          <div class="vs-box vs-r"><div class="vs-lbl">■ Vermelho</div><div class="vs-nm" id="aRed">—</div></div>
           <div class="vs-sep">VS</div>
-          <div class="vs-box vs-blue"><div class="vs-label">Azul ■</div><div class="vs-name" id="aBlue">—</div></div>
+          <div class="vs-box vs-b"><div class="vs-lbl">Azul ■</div><div class="vs-nm" id="aBlue">—</div></div>
         </div>
-        <div class="round-dots">
-          <div class="round-dot" id="dot1" onclick="setRound(1)">1</div>
-          <div class="round-dot" id="dot2" onclick="setRound(2)">2</div>
-          <div class="round-dot" id="dot3" onclick="setRound(3)">3</div>
+        <div class="rdots">
+          <div class="rdot" id="dot1" onclick="setRound(1)">1</div>
+          <div class="rdot" id="dot2" onclick="setRound(2)">2</div>
+          <div class="rdot" id="dot3" onclick="setRound(3)">3</div>
         </div>
-        <div class="timer-row">
-          <button class="timer-btn tbtn-reset" onclick="resetTimer()">↻</button>
-          <div class="timer-big" id="aTimer">3:00</div>
-          <button class="timer-btn tbtn-start" id="btnStart" onclick="startTimer()">▶</button>
-          <button class="timer-btn tbtn-pause" id="btnPause" onclick="pauseTimer()">⏸</button>
+        <div class="tmr-row">
+          <button class="tbtn tb-r" onclick="resetTimer()">↻</button>
+          <div class="tmr-big" id="aTimer">3:00</div>
+          <button class="tbtn tb-s" id="btnStart" onclick="startTimer()">▶</button>
+          <button class="tbtn tb-p" id="btnPause" onclick="pauseTimer()">⏸</button>
         </div>
-        <div class="score-row">
-          <div class="score-side">
-            <button class="score-adj sadj-rm" onclick="adjustScore('red',-1)">−</button>
-            <button class="score-adj sadj-rp" onclick="adjustScore('red',1)">+</button>
-            <div>
-              <div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:rgba(200,80,60,.7);letter-spacing:2px">VERM</div>
-              <div class="score-big red" id="aScoreR">0</div>
-            </div>
+        <div class="sc-row">
+          <div class="sc-side">
+            <button class="sadj sa-rm" onclick="adjScore('red',-1)">−</button>
+            <button class="sadj sa-rp" onclick="adjScore('red',1)">+</button>
+            <div><div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:rgba(200,80,60,.7);letter-spacing:2px">VERM</div><div class="sc-big r" id="aSR">0</div></div>
           </div>
-          <div class="score-vs">:</div>
-          <div class="score-side right">
-            <div style="text-align:right">
-              <div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:rgba(70,110,210,.7);letter-spacing:2px">AZUL</div>
-              <div class="score-big blue" id="aScoreB">0</div>
-            </div>
-            <button class="score-adj sadj-bp" onclick="adjustScore('blue',1)">+</button>
-            <button class="score-adj sadj-bm" onclick="adjustScore('blue',-1)">−</button>
+          <div class="sc-vs">:</div>
+          <div class="sc-side rt">
+            <div style="text-align:right"><div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:rgba(70,110,210,.7);letter-spacing:2px">AZUL</div><div class="sc-big b" id="aSB">0</div></div>
+            <button class="sadj sa-bp" onclick="adjScore('blue',1)">+</button>
+            <button class="sadj sa-bm" onclick="adjScore('blue',-1)">−</button>
           </div>
         </div>
         <div style="display:flex;gap:7px">
-          <button class="btn btn-gold" style="flex:1" onclick="openWinnerModal()">🏆 Declarar Vencedor</button>
-          <button class="btn btn-outline" style="width:auto;padding:7px 12px" onclick="resetMatch()">↺</button>
+          <button class="btn btn-gold" style="flex:1;margin:0" onclick="openWinModal()">🏆 Declarar Vencedor</button>
+          <button class="btn btn-o" style="width:auto;margin:0;padding:7px 12px" onclick="resetMatch()">↺</button>
         </div>
       </div>
     </div>
-
-    <!-- BRACKET -->
-    <div class="tab-panel" id="tab-bracket">
-      <div style="background:var(--su);border:1px solid var(--b2);border-radius:4px;padding:14px;overflow-x:auto">
-        <div class="bracket-inner" id="aBracket"></div>
-      </div>
-    </div>
-
-    <!-- CALENDÁRIO -->
-    <div class="tab-panel" id="tab-schedule">
+    <div class="tab-p" id="tab-bkt"><div style="background:var(--su);border:1px solid var(--b2);border-radius:4px;padding:14px;overflow-x:auto"><div class="bkt-inner" id="aBkt"></div></div></div>
+    <div class="tab-p" id="tab-sch"><div style="background:var(--su);border:1px solid var(--b2);border-radius:4px;padding:14px"><div id="schedEdit"></div><button class="btn btn-g" style="margin-top:10px;width:auto;padding:7px 16px" onclick="saveSchedule()">💾 Guardar</button></div></div>
+    <div class="tab-p" id="tab-tp">
       <div style="background:var(--su);border:1px solid var(--b2);border-radius:4px;padding:14px">
-        <div id="schedEditList"><div style="color:var(--td);font-size:12px">Gera o bracket primeiro</div></div>
-        <button class="btn btn-green" style="margin-top:10px;width:auto;padding:7px 16px" onclick="saveSchedule()">💾 Guardar Calendário</button>
-      </div>
-    </div>
-
-    <!-- TOUCHPORTAL -->
-    <div class="tab-panel" id="tab-tp">
-      <div style="background:var(--su);border:1px solid var(--b2);border-radius:4px;padding:14px">
-        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;color:var(--td);margin-bottom:12px">COMANDOS TOUCHPORTAL — JS Plugin</div>
-        <div style="font-size:11px;color:var(--td);margin-bottom:2px">▶ Iniciar Timer</div>
-        <code class="tp-code">localStorage.setItem('pt_cmd',JSON.stringify({cmd:'start_timer'}))</code>
-        <div style="font-size:11px;color:var(--td);margin-bottom:2px">⏸ Pausar</div>
-        <code class="tp-code">localStorage.setItem('pt_cmd',JSON.stringify({cmd:'pause_timer'}))</code>
-        <div style="font-size:11px;color:var(--td);margin-bottom:2px">⏭ Próximo Round</div>
-        <code class="tp-code">localStorage.setItem('pt_cmd',JSON.stringify({cmd:'next_round'}))</code>
-        <div style="font-size:11px;color:var(--td);margin-bottom:2px">+1 Vermelho</div>
-        <code class="tp-code">localStorage.setItem('pt_cmd',JSON.stringify({cmd:'score',team:'red',val:1}))</code>
-        <div style="font-size:11px;color:var(--td);margin-bottom:2px">+1 Azul</div>
-        <code class="tp-code">localStorage.setItem('pt_cmd',JSON.stringify({cmd:'score',team:'blue',val:1}))</code>
-        <div style="margin-top:12px;background:rgba(74,90,46,.08);border:1px solid rgba(74,90,46,.25);border-radius:3px;padding:10px;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--td);line-height:1.8">
-          OBS → Browser Source → stream.html · 1920×200px · ✓ Refresh on scene activate
-        </div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;color:var(--td);margin-bottom:12px">TOUCHPORTAL — JS Plugin</div>
+        <div style="font-size:11px;color:var(--td);margin-bottom:2px">▶ Iniciar</div><code class="tp-code">localStorage.setItem('pt_cmd',JSON.stringify({cmd:'start_timer'}))</code>
+        <div style="font-size:11px;color:var(--td);margin-bottom:2px">⏸ Pausar</div><code class="tp-code">localStorage.setItem('pt_cmd',JSON.stringify({cmd:'pause_timer'}))</code>
+        <div style="font-size:11px;color:var(--td);margin-bottom:2px">⏭ Próximo Round</div><code class="tp-code">localStorage.setItem('pt_cmd',JSON.stringify({cmd:'next_round'}))</code>
+        <div style="font-size:11px;color:var(--td);margin-bottom:2px">+1 Vermelho</div><code class="tp-code">localStorage.setItem('pt_cmd',JSON.stringify({cmd:'score',team:'red',val:1}))</code>
+        <div style="font-size:11px;color:var(--td);margin-bottom:2px">+1 Azul</div><code class="tp-code">localStorage.setItem('pt_cmd',JSON.stringify({cmd:'score',team:'blue',val:1}))</code>
+        <div style="margin-top:10px;background:rgba(74,90,46,.08);border:1px solid rgba(74,90,46,.22);border-radius:3px;padding:10px;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--td);line-height:1.8">OBS → Browser Source → stream.html · 1920×200 · ✓ Refresh on scene activate</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- WINNER MODAL -->
-<div class="modal" id="winnerModal">
+<div class="modal" id="winModal">
   <div class="modal-box">
-    <div class="modal-title">⚔ Vencedor</div>
-    <div class="modal-sub" id="modalSub">QUAL O VENCEDOR?</div>
-    <div class="winner-btns">
-      <button class="winner-btn wbtn-red" onclick="declareWinner('red')">■<br><span id="wbRed">Vermelho</span></button>
-      <button class="winner-btn wbtn-draw" onclick="declareWinner('draw')">⚖<br>Empate</button>
-      <button class="winner-btn wbtn-blue" onclick="declareWinner('blue')">■<br><span id="wbBlue">Azul</span></button>
+    <div class="modal-t">⚔ Vencedor</div>
+    <div class="modal-s" id="modalSub">QUAL O VENCEDOR?</div>
+    <div class="w-btns">
+      <button class="wbtn wb-r" onclick="declareWinner('red')">■<br><span id="wbR">Vermelho</span></button>
+      <button class="wbtn wb-d" onclick="declareWinner('draw')">⚖<br>Empate</button>
+      <button class="wbtn wb-b" onclick="declareWinner('blue')">■<br><span id="wbB">Azul</span></button>
     </div>
-    <button class="btn btn-outline" onclick="closeWinnerModal()">Cancelar</button>
+    <button class="btn btn-o" onclick="closeWinModal()">Cancelar</button>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-// PT BOXING CHAMPIONSHIP
-// Credenciais vêm do config.js
-// Supabase Realtime para sync em tempo real
-// ═══════════════════════════════════════════════════════
-const { createClient } = supabase;
+// ═══════════════════════════════════════════════════════════════
+// PT BOXING — Timer baseado em timestamp do servidor
+// ── Como funciona ──────────────────────────────────────────────
+// Quando admin clica ▶, guarda timerStartedAt = Date.now()
+// Todos os devices calculam o tempo restante como:
+//   restante = roundDuration - (Date.now() - timerStartedAt) / 1000
+// Assim o timer funciona mesmo com o browser minimizado ou em
+// outro dispositivo — não depende de setInterval do admin
+// ═══════════════════════════════════════════════════════════════
 
-// Credenciais do config.js
-const SB_URL = 'https://xzkvpaokqbdjlsozjqut.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6a3ZwYW9rcWJkamxzb3pqcXV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzNDExMTksImV4cCI6MjA4ODkxNzExOX0.Av2vtyeQ6hpX9r_0clJWDeOFsY6h74RZ63l5-3Fw7zI';
+const { createClient } = supabase;
+const SB_URL = (typeof SUPABASE_URL !== 'undefined') ? SUPABASE_URL : '';
+const SB_KEY = (typeof SUPABASE_KEY !== 'undefined') ? SUPABASE_KEY : '';
 
 let db = null;
-let rtChannel = null;
 let isAdmin = false;
-let timerInterval = null;
-let lastScoreR = -1, lastScoreB = -1;
+let displayInt = null; // apenas para actualizar o display local
+let lastSR = -1, lastSB = -1;
+let saveTimer = null;
 
+// ── ESTADO ────────────────────────────────────────────────────
+// timerRunning: true/false
+// timerStartedAt: timestamp (ms) de quando o timer começou
+// timerPausedAt: segundos restantes quando foi pausado
+// roundDuration: duração total do round em segundos
 let S = {
   champName: 'PT BOXING CHAMPIONSHIP',
   adminPin: '1234',
@@ -471,219 +394,303 @@ let S = {
   currentMatch: null,
   currentRound: 1,
   roundDuration: 180,
+  timerRunning: false,
+  timerStartedAt: null,  // timestamp ms quando iniciou
+  timerPausedAt: null,   // segundos restantes quando pausou
   scoreRed: 0,
   scoreBlue: 0,
-  timerSec: 180,
-  timerRunning: false,
   champion: null
 };
 
-// ── DB ──────────────────────────────────────────────────
-function connectDB() {
-  if (!SB_URL || !SB_KEY) { updateDbStatus('na'); return; }
+// ── TIMER (baseado em timestamp) ─────────────────────────────
+// Calcula segundos restantes a partir do estado guardado
+function calcTimer() {
+  if (!S.timerRunning) {
+    // Pausado ou parado — usa timerPausedAt ou roundDuration
+    if (S.timerPausedAt !== null) return Math.max(0, S.timerPausedAt);
+    return S.roundDuration;
+  }
+  if (!S.timerStartedAt) return S.roundDuration;
+  const elapsed = (Date.now() - S.timerStartedAt) / 1000;
+  const pausedSecs = S.timerPausedAt !== null ? S.timerPausedAt : S.roundDuration;
+  return Math.max(0, pausedSecs - elapsed);
+}
+
+function startTimer() {
+  if (S.timerRunning) return;
+  if (!S.currentMatch) return toast('Selecciona um combate', 'err');
+  // Guarda o momento de início — todos os devices calculam a partir daqui
+  S.timerStartedAt = Date.now();
+  S.timerRunning = true;
+  updateTimerUI(true);
+  save();
+  startDisplayLoop();
+}
+
+function pauseTimer() {
+  if (!S.timerRunning) return;
+  S.timerPausedAt = Math.round(calcTimer()); // guarda os segundos restantes
+  S.timerRunning = false;
+  S.timerStartedAt = null;
+  updateTimerUI(false);
+  stopDisplayLoop();
+  save();
+}
+
+function resetTimer() {
+  S.timerRunning = false;
+  S.timerStartedAt = null;
+  S.timerPausedAt = null;
+  updateTimerUI(false);
+  stopDisplayLoop();
+  save();
+}
+
+function nextRound() {
+  if (S.currentRound >= 3) return;
+  S.currentRound++;
+  S.timerRunning = false;
+  S.timerStartedAt = null;
+  S.timerPausedAt = null;
+  updateTimerUI(false);
+  stopDisplayLoop();
+  save();
+  toast('Round ' + S.currentRound, 'info');
+  renderAll();
+}
+
+function setRound(n) {
+  pauseTimer();
+  S.currentRound = n;
+  S.timerRunning = false;
+  S.timerStartedAt = null;
+  S.timerPausedAt = null;
+  updateTimerUI(false);
+  save();
+  renderAll();
+}
+
+// Loop de display local — apenas actualiza o ecrã, não guarda nada
+function startDisplayLoop() {
+  stopDisplayLoop();
+  displayInt = setInterval(() => {
+    const secs = calcTimer();
+    updateTimerDisplay(secs);
+    // Verificar se chegou a zero
+    if (secs <= 0 && S.timerRunning) {
+      S.timerRunning = false;
+      S.timerPausedAt = 0;
+      S.timerStartedAt = null;
+      updateTimerUI(false);
+      stopDisplayLoop();
+      save();
+      toast('Round ' + S.currentRound + ' terminado!', 'info');
+      if (S.currentRound < 3) setTimeout(nextRound, 1500);
+    }
+  }, 250);
+}
+
+function stopDisplayLoop() {
+  clearInterval(displayInt);
+  displayInt = null;
+}
+
+function updateTimerUI(running) {
+  const bs = document.getElementById('btnStart');
+  const bp = document.getElementById('btnPause');
+  if (bs) bs.style.display = running ? 'none' : 'flex';
+  if (bp) bp.style.display = running ? 'flex' : 'none';
+  if (running) startDisplayLoop();
+}
+
+function updateTimerDisplay(secs) {
+  const t = Math.round(secs);
+  const str = fmt(t);
+  const danger = t <= 10 && t > 0;
+  const el1 = document.getElementById('aTimer');
+  const el2 = document.getElementById('vTimer');
+  if (el1) { el1.textContent = str; el1.className = 'tmr-big' + (danger ? ' danger' : ''); }
+  if (el2) { el2.textContent = str; el2.className = 'tmr' + (danger ? ' danger' : ''); }
+  // Live badge
+  const lb = document.getElementById('liveBadge');
+  if (lb) lb.style.display = S.timerRunning ? 'inline-flex' : 'none';
+}
+
+// ── BASE DE DADOS ─────────────────────────────────────────────
+function initDB() {
+  if (!SB_URL || !SB_KEY) { setDbStatus('na'); return; }
   try {
     db = createClient(SB_URL, SB_KEY);
     // Carregar estado inicial
     db.from('boxing_state').select('data').eq('id','main').single()
       .then(({ data, error }) => {
         if (!error && data?.data) {
-          applyState(data.data);
-          updateDbStatus('ok');
+          applyRemoteState(data.data);
+          setDbStatus('ok');
         } else {
-          updateDbStatus('ok'); // ligou mas sem dados ainda
+          setDbStatus('ok');
         }
-        subscribeRealtime();
+        // Subscrever a mudanças — viewers recebem em tempo real
+        subscribeDB();
       })
-      .catch(() => { updateDbStatus('err'); db = null; });
-  } catch(e) { updateDbStatus('err'); db = null; }
+      .catch(() => { setDbStatus('err'); db = null; });
+  } catch(e) { setDbStatus('err'); db = null; }
 }
 
-function subscribeRealtime() {
+function subscribeDB() {
   if (!db) return;
-  if (rtChannel) db.removeChannel(rtChannel);
-  rtChannel = db.channel('boxing')
+  db.channel('boxing')
     .on('postgres_changes', {
       event: 'UPDATE', schema: 'public',
       table: 'boxing_state', filter: 'id=eq.main'
     }, payload => {
-      if (!isAdmin && payload.new?.data) applyState(payload.new.data);
+      if (isAdmin) return; // admin é a fonte, não recebe
+      if (payload.new?.data) applyRemoteState(payload.new.data);
     })
     .subscribe();
 }
 
-function applyState(data) {
-  // Admin é a fonte — nunca recebe push que mate o timer
-  if (isAdmin) return;
-  S = { ...S, ...data, timerRunning: false };
-  localStorage.setItem('pt_state', JSON.stringify(S));
+// Aplica estado recebido do servidor (viewers)
+function applyRemoteState(data) {
+  const wasRunning = S.timerRunning;
+  S = { ...S, ...data };
   renderAll();
+  // Se o timer está a correr no servidor, iniciar display loop local
+  if (S.timerRunning && !wasRunning) startDisplayLoop();
+  else if (!S.timerRunning) stopDisplayLoop();
+  updateTimerDisplay(calcTimer());
 }
 
 async function saveDB() {
-  const data = { ...S };
-  localStorage.setItem('pt_state', JSON.stringify(data));
   if (!db) return;
   try {
-    await db.from('boxing_state').upsert({ id: 'main', data }, { onConflict: 'id' });
-  } catch(e) { console.error('save error', e); }
+    await db.from('boxing_state').upsert({ id: 'main', data: S }, { onConflict: 'id' });
+    setDbStatus('ok');
+  } catch(e) { setDbStatus('err'); }
 }
 
-function updateDbStatus(s) {
+function save() {
+  const ci = document.getElementById('champInput');
+  if (ci) S.champName = ci.value || S.champName;
+  localStorage.setItem('pt_state', JSON.stringify(S));
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveDB, 500);
+}
+
+async function forceSave() {
+  const ci = document.getElementById('champInput'); if (ci) S.champName = ci.value;
+  const pi = document.getElementById('pinInput'); if (pi?.value.trim()) S.adminPin = pi.value.trim();
+  localStorage.setItem('pt_state', JSON.stringify(S));
+  await saveDB();
+  toast('✔ Guardado e sincronizado!', 'ok');
+}
+
+function setDbStatus(s) {
   const el = document.getElementById('dbStatus');
+  const dot = document.getElementById('dbDot');
   if (!el) return;
-  if (s === 'ok')  { el.className = 'db-status db-ok';  el.textContent = '✔ Supabase — tempo real activo'; }
-  if (s === 'err') { el.className = 'db-status db-err'; el.textContent = '✖ Erro de ligação ao Supabase'; }
-  if (s === 'na')  { el.className = 'db-status db-na';  el.textContent = '◌ Sem BD — config.js sem credenciais'; }
+  if (s === 'ok')  { el.className='db-box db-ok'; el.textContent='✔ Supabase — ligado'; if(dot)dot.className='db-dot ok'; }
+  if (s === 'err') { el.className='db-box db-err'; el.textContent='✖ Erro de ligação'; if(dot)dot.className='db-dot err'; }
+  if (s === 'na')  { el.className='db-box db-na'; el.textContent='◌ config.js sem credenciais'; if(dot)dot.className='db-dot'; }
 }
 
-// ── INIT ────────────────────────────────────────────────
+// ── INIT ─────────────────────────────────────────────────────
 function init() {
-  // Carregar estado local primeiro
   const lc = localStorage.getItem('pt_state');
-  if (lc) try { S = { ...S, ...JSON.parse(lc), timerRunning: false }; } catch(e) {}
-
-  // Mostrar site imediatamente
+  if (lc) try { S = { ...S, ...JSON.parse(lc) }; } catch(e) {}
+  S.timerRunning = false; // nunca restaurar timer correndo do localStorage
   renderAll();
   setInterval(checkTP, 200);
-
-  // Ligar BD em background
-  connectDB();
+  initDB();
 }
 
-// ── AUTH ────────────────────────────────────────────────
+// ── AUTH ─────────────────────────────────────────────────────
 function adminLogin() {
   const pin = prompt('PIN:');
   if (!pin) return;
   if (pin === (S.adminPin || '1234')) {
     isAdmin = true;
-    // Admin não recebe push (é a fonte)
-    if (rtChannel) db?.removeChannel(rtChannel);
     document.getElementById('viewerPage').style.display = 'none';
-    document.getElementById('adminPage').className = 'admin-layout show';
+    document.getElementById('adminPage').className = 'adm-layout show';
     renderAdmin();
     toast('Admin activo', 'ok');
-  } else {
-    toast('PIN incorrecto', 'err');
-  }
+  } else toast('PIN incorrecto', 'err');
 }
 
 function showViewer() {
   isAdmin = false;
+  stopDisplayLoop();
   document.getElementById('viewerPage').style.display = 'block';
-  document.getElementById('adminPage').className = 'admin-layout';
-  subscribeRealtime();
+  document.getElementById('adminPage').className = 'adm-layout';
   renderAll();
+  if (S.timerRunning) startDisplayLoop();
 }
 
-// ── SAVE ────────────────────────────────────────────────
-let saveTimer = null;
-function save() {
-  const ci = document.getElementById('champNameInput');
-  if (ci) S.champName = ci.value || S.champName;
-  localStorage.setItem('pt_state', JSON.stringify(S));
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveDB, 600);
-}
-
-function quickSave() {
-  localStorage.setItem('pt_state', JSON.stringify(S));
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => { if (db) saveDB(); }, 400);
-}
-
-async function saveAndSync() {
-  const ci = document.getElementById('champNameInput');
-  if (ci) S.champName = ci.value;
-  const pi = document.getElementById('pinInput');
-  if (pi?.value.trim()) S.adminPin = pi.value.trim();
-  await saveDB();
-  toast('Guardado e sincronizado!', 'ok');
-}
-
-// ── FIGHTERS ────────────────────────────────────────────
+// ── FIGHTERS ─────────────────────────────────────────────────
 function addFighter() {
-  const n = document.getElementById('fighterName').value.trim();
-  const c = document.getElementById('fighterCat').value;
+  const n = document.getElementById('fName').value.trim();
+  const c = document.getElementById('fCat').value;
   if (!n) return toast('Insere o nome', 'err');
   if (S.fighters.find(f => f.name.toLowerCase() === n.toLowerCase())) return toast('Já existe', 'err');
   S.fighters.push({ id: Date.now(), name: n, cat: c });
-  document.getElementById('fighterName').value = '';
+  document.getElementById('fName').value = '';
   save(); renderFighters(); toast(n + ' adicionado', 'ok');
 }
 
-function removeFighter(id) {
-  S.fighters = S.fighters.filter(f => f.id !== id);
-  save(); renderFighters();
-}
+function removeFighter(id) { S.fighters = S.fighters.filter(f => f.id !== id); save(); renderFighters(); }
 
 function renderFighters() {
-  const el = document.getElementById('fighterList');
-  if (!el) return;
-  el.innerHTML = S.fighters.map((f, i) =>
-    `<div class="fighter-item">
-      <span style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--td);width:12px">${i+1}</span>
-      <span class="fighter-name">${f.name}</span>
-      <span class="fighter-cat">${f.cat}</span>
-      <button class="btn btn-danger" style="width:auto;padding:1px 6px;font-size:9px;margin:0" onclick="removeFighter(${f.id})">✕</button>
-    </div>`).join('') || '<div style="color:var(--td);font-size:9px;padding:8px;text-align:center;font-family:Share Tech Mono,monospace">SEM LUTADORES</div>';
+  const el = document.getElementById('fighterList'); if (!el) return;
+  el.innerHTML = S.fighters.map((f,i) =>
+    `<div class="fi"><span style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--td);width:12px">${i+1}</span>
+    <span class="fi-n">${f.name}</span><span class="fi-c">${f.cat}</span>
+    <button class="btn btn-d" style="width:auto;padding:1px 6px;font-size:9px;margin:0" onclick="removeFighter(${f.id})">✕</button></div>`
+  ).join('') || '<div style="color:var(--td);font-size:9px;padding:8px;text-align:center">SEM LUTADORES</div>';
 }
 
-// ── BRACKET ─────────────────────────────────────────────
+// ── BRACKET ──────────────────────────────────────────────────
 function generateBracket() {
   if (S.fighters.length < 2) return toast('Mínimo 2 lutadores', 'err');
-  if (!confirm('Gerar novo bracket? Apaga o actual.')) return;
+  if (!confirm('Gerar novo bracket?')) return;
   S.champion = null; S.currentMatch = null; S.bracket = []; S.schedule = {};
-  const shuffled = [...S.fighters].sort(() => Math.random() - .5);
-  const n = Math.pow(2, Math.ceil(Math.log2(shuffled.length)));
-  while (shuffled.length < n) shuffled.push(null);
-  let round = shuffled, rn = 1;
-  while (round.length > 1) {
-    const matches = [];
-    for (let i = 0; i < round.length; i += 2) {
-      const f1 = round[i], f2 = round[i+1], bye = !f1 || !f2;
-      matches.push({
-        id: `r${rn}_m${Math.floor(i/2)+1}`, rn,
-        label: roundLabel(round.length/2),
-        f1: f1?.name || null, f2: f2?.name || null,
-        c1: f1?.cat || '', c2: f2?.cat || '',
-        winner: bye ? (f1?.name || f2?.name) : null,
-        s1: 0, s2: 0, bye
-      });
+  S.timerRunning = false; S.timerStartedAt = null; S.timerPausedAt = null;
+  const sh = [...S.fighters].sort(() => Math.random() - .5);
+  const n = Math.pow(2, Math.ceil(Math.log2(sh.length)));
+  while (sh.length < n) sh.push(null);
+  let cur = sh, rn = 1;
+  while (cur.length > 1) {
+    const ms = [];
+    for (let i = 0; i < cur.length; i += 2) {
+      const f1 = cur[i], f2 = cur[i+1], bye = !f1 || !f2;
+      ms.push({ id:`r${rn}_m${Math.floor(i/2)+1}`, rn, label:rlbl(cur.length/2),
+        f1:f1?.name||null, f2:f2?.name||null, c1:f1?.cat||'', c2:f2?.cat||'',
+        winner:bye?(f1?.name||f2?.name):null, s1:0, s2:0, bye });
     }
-    S.bracket.push({ rn, matches });
-    round = matches.map(m => m.winner ? { name: m.winner } : { name: 'TBD' });
+    S.bracket.push({ rn, matches: ms });
+    cur = ms.map(m => m.winner ? {name:m.winner} : {name:'TBD'});
     rn++;
   }
-  S.roundDuration = parseInt(document.getElementById('roundDurInput').value) || 180;
-  S.timerSec = S.roundDuration;
+  S.roundDuration = parseInt(document.getElementById('roundDur').value) || 180;
   save(); renderAll(); toast('Bracket gerado!', 'ok');
 }
 
-function roundLabel(n) {
-  return n===1?'FINAL':n===2?'MEIAS-FINAIS':n===4?'QUARTOS':n===8?'OITAVOS':'ELIM';
-}
+function rlbl(n) { return n===1?'FINAL':n===2?'MEIAS':n===4?'QUARTOS':n===8?'OITAVOS':'ELIM'; }
+function getMatch(id) { if (!id) return null; for (const r of S.bracket) for (const m of r.matches) if (m.id===id) return m; return null; }
 
-function getMatch(id) {
-  if (!id) return null;
-  for (const r of S.bracket) for (const m of r.matches) if (m.id === id) return m;
-  return null;
-}
-
-// ── RENDER BRACKET ──────────────────────────────────────
-function renderBracket(el, interactive) {
+// ── RENDER ───────────────────────────────────────────────────
+function renderBkt(el, interactive) {
   if (!el) return;
-  if (!S.bracket.length) { el.innerHTML = '<div style="font-family:Share Tech Mono,monospace;font-size:9px;color:var(--td);letter-spacing:3px">SEM BRACKET</div>'; return; }
-  let h = '';
+  if (!S.bracket.length) { el.innerHTML='<div style="font-family:Share Tech Mono,monospace;font-size:9px;color:var(--td);letter-spacing:3px">SEM BRACKET</div>'; return; }
+  let h='';
   S.bracket.forEach(r => {
-    const real = r.matches.filter(m => !m.bye);
-    if (!real.length) return;
-    h += `<div class="bracket-col"><div class="bracket-col-title">${real[0].label}</div><div class="bracket-matches">`;
+    const real = r.matches.filter(m => !m.bye); if (!real.length) return;
+    h += `<div class="bkt-col"><div class="bkt-col-t">${real[0].label}</div><div class="bkt-matches">`;
     real.forEach(m => {
       const click = interactive ? `onclick="selectMatch('${m.id}')" style="cursor:pointer"` : '';
-      h += `<div class="bracket-match ${S.currentMatch===m.id?'current':''} ${m.winner?'done':''}" ${click}>
-        <div class="bracket-fighter red ${m.winner===m.f1?'winner':''}">${m.f1||'?'} <span class="bracket-score">${m.s1}</span></div>
-        <div class="bracket-divider"></div>
-        <div class="bracket-fighter blue ${m.winner===m.f2?'winner':''}">${m.f2||'?'} <span class="bracket-score">${m.s2}</span></div>
+      h += `<div class="bkt-match ${S.currentMatch===m.id?'cur':''} ${m.winner?'done':''}" ${click}>
+        <div class="bkt-f r ${m.winner===m.f1?'win':''}">${m.f1||'?'} <span class="bkt-sc">${m.s1}</span></div>
+        <div class="bkt-div"></div>
+        <div class="bkt-f b ${m.winner===m.f2?'win':''}">${m.f2||'?'} <span class="bkt-sc">${m.s2}</span></div>
       </div>`;
     });
     h += '</div></div>';
@@ -691,325 +698,203 @@ function renderBracket(el, interactive) {
   el.innerHTML = h;
 }
 
-// ── RENDER VIEWER ───────────────────────────────────────
 function renderViewer() {
-  let total = 0, done = 0;
-  S.bracket.forEach(r => r.matches.forEach(m => { if (!m.bye) { total++; if (m.winner) done++; } }));
-  const activeRound = S.bracket.find(r => r.matches.some(m => !m.winner && !m.bye));
-  const phase = activeRound?.matches.find(m => !m.winner && !m.bye)?.label || '—';
-
+  let total=0, done=0;
+  S.bracket.forEach(r => r.matches.forEach(m => { if(!m.bye){total++;if(m.winner)done++;} }));
+  const ar = S.bracket.find(r => r.matches.some(m => !m.winner && !m.bye));
+  const ph = ar?.matches.find(m => !m.winner && !m.bye)?.label || '—';
   document.getElementById('statF').textContent = S.fighters.length;
   document.getElementById('statM').textContent = total;
   document.getElementById('statD').textContent = done;
-  document.getElementById('statR').textContent = phase.length > 5 ? phase.slice(0,5) : phase;
-
-  const titleEl = document.getElementById('siteTitle');
-  if (titleEl) titleEl.textContent = S.champName || 'PT BOXING';
-
+  document.getElementById('statR').textContent = ph.length>5?ph.slice(0,5):ph;
+  const t=document.getElementById('siteTitle'); if(t) t.textContent=S.champName||'PT BOXING';
   const m = getMatch(S.currentMatch);
-  document.getElementById('noMatch').style.display = m ? 'none' : 'block';
-  document.getElementById('fightCard').style.display = m ? 'block' : 'none';
-
+  document.getElementById('noMatch').style.display = m?'none':'block';
+  document.getElementById('fightCard').style.display = m?'block':'none';
   if (m) {
     document.getElementById('vRound').textContent = m.label;
-    document.getElementById('vRed').textContent = m.f1 || '—';
-    document.getElementById('vBlue').textContent = m.f2 || '—';
-    document.getElementById('vRedCat').textContent = m.c1 || '';
-    document.getElementById('vBlueCat').textContent = m.c2 || '';
-    const sc = S.schedule[m.id] || {};
-    document.getElementById('vDate').textContent = sc.date || '—';
-    document.getElementById('vTime').textContent = sc.time || '—';
-
-    const tv = document.getElementById('vTimer');
-    tv.textContent = fmt(S.timerSec);
-    tv.className = 'timer' + (S.timerSec <= 10 && S.timerSec > 0 ? ' danger' : '');
-
-    const sr = document.getElementById('vScoreR'), sb = document.getElementById('vScoreB');
-    if (S.scoreRed !== lastScoreR) { sr.textContent = S.scoreRed; sr.classList.remove('flash'); void sr.offsetWidth; sr.classList.add('flash'); lastScoreR = S.scoreRed; }
-    if (S.scoreBlue !== lastScoreB) { sb.textContent = S.scoreBlue; sb.classList.remove('flash'); void sb.offsetWidth; sb.classList.add('flash'); lastScoreB = S.scoreBlue; }
-
-    for (let i = 1; i <= 3; i++) {
-      const p = document.getElementById('vPip' + i);
-      p.className = 'round-pip' + (i < S.currentRound ? ' done' : i === S.currentRound ? ' active' : '');
-    }
-
-    const wEl = document.getElementById('vWinner');
-    if (m.winner) { wEl.classList.add('show'); document.getElementById('vWinnerName').textContent = m.winner; }
-    else wEl.classList.remove('show');
+    document.getElementById('vRed').textContent = m.f1||'—';
+    document.getElementById('vBlue').textContent = m.f2||'—';
+    document.getElementById('vRedCat').textContent = m.c1||'';
+    document.getElementById('vBlueCat').textContent = m.c2||'';
+    const sc = S.schedule[m.id]||{};
+    document.getElementById('vDate').textContent = sc.date||'—';
+    document.getElementById('vTime').textContent = sc.time||'—';
+    const sr=document.getElementById('vSR'), sb=document.getElementById('vSB');
+    if(S.scoreRed!==lastSR){sr.textContent=S.scoreRed;sr.classList.remove('flash');void sr.offsetWidth;sr.classList.add('flash');lastSR=S.scoreRed;}
+    if(S.scoreBlue!==lastSB){sb.textContent=S.scoreBlue;sb.classList.remove('flash');void sb.offsetWidth;sb.classList.add('flash');lastSB=S.scoreBlue;}
+    for(let i=1;i<=3;i++){const p=document.getElementById('vP'+i);p.className='rp'+(i<S.currentRound?' dn':i===S.currentRound?' act':'');}
+    const w=document.getElementById('vWinner');
+    if(m.winner){w.classList.add('show');document.getElementById('vWinnerName').textContent=m.winner;}else w.classList.remove('show');
   }
-
-  const live = m && S.timerRunning;
-  document.getElementById('liveBadge').style.display = live ? 'inline-flex' : 'none';
-
-  const cs = document.getElementById('championSection');
-  if (S.champion) { cs.classList.add('show'); document.getElementById('championName').textContent = S.champion; }
-  else cs.classList.remove('show');
-
-  renderBracket(document.getElementById('bracketView'), false);
-  renderScheduleView();
+  updateTimerDisplay(calcTimer());
+  const cs=document.getElementById('champSec');
+  if(S.champion){cs.classList.add('show');document.getElementById('champNm').textContent=S.champion;}else cs.classList.remove('show');
+  renderBkt(document.getElementById('bktView'), false);
+  renderSchedView();
 }
 
 function renderAdmin() {
-  const m = getMatch(S.currentMatch);
-  document.getElementById('aRed').textContent = m?.f1 || '—';
-  document.getElementById('aBlue').textContent = m?.f2 || '—';
-  document.getElementById('matchLabel').textContent = m ? m.label + ' — ' + m.f1 + ' vs ' + m.f2 : 'Nenhum combate seleccionado';
-  document.getElementById('wbRed').textContent = m?.f1 || 'Vermelho';
-  document.getElementById('wbBlue').textContent = m?.f2 || 'Azul';
-
-  const bdg = document.getElementById('matchBadge');
-  if (m?.winner) { bdg.className = 'badge badge-done'; bdg.textContent = '✔ ' + m.winner; }
-  else { bdg.className = 'badge badge-live'; bdg.textContent = 'AO VIVO'; }
-
-  for (let i = 1; i <= 3; i++) {
-    const d = document.getElementById('dot' + i);
-    d.className = 'round-dot' + (i < S.currentRound ? ' done' : i === S.currentRound ? ' active' : '');
-  }
-
-  const at = document.getElementById('aTimer');
-  at.textContent = fmt(S.timerSec);
-  at.className = 'timer-big' + (S.timerSec <= 10 && S.timerSec > 0 ? ' danger' : '');
-
-  document.getElementById('aScoreR').textContent = S.scoreRed;
-  document.getElementById('aScoreB').textContent = S.scoreBlue;
-
-  const cc = document.getElementById('champCard');
-  if (S.champion) { cc.style.display = 'block'; document.getElementById('champCardName').textContent = S.champion; }
-  else cc.style.display = 'none';
-
-  renderFighters();
-  renderMatchGrid();
-  renderBracket(document.getElementById('aBracket'), true);
-  renderScheduleEdit();
+  const m=getMatch(S.currentMatch);
+  document.getElementById('aRed').textContent=m?.f1||'—';
+  document.getElementById('aBlue').textContent=m?.f2||'—';
+  document.getElementById('matchLabel').textContent=m?m.label+' — '+m.f1+' vs '+m.f2:'Nenhum combate';
+  document.getElementById('wbR').textContent=m?.f1||'Vermelho';
+  document.getElementById('wbB').textContent=m?.f2||'Azul';
+  const bdg=document.getElementById('matchBadge');
+  if(m?.winner){bdg.className='badge b-done';bdg.textContent='✔ '+m.winner;}else{bdg.className='badge b-live';bdg.textContent='AO VIVO';}
+  for(let i=1;i<=3;i++){const d=document.getElementById('dot'+i);d.className='rdot'+(i<S.currentRound?' dn':i===S.currentRound?' act':'');}
+  updateTimerDisplay(calcTimer());
+  updateTimerUI(S.timerRunning);
+  document.getElementById('aSR').textContent=S.scoreRed;
+  document.getElementById('aSB').textContent=S.scoreBlue;
+  const cc=document.getElementById('champCard');
+  if(S.champion){cc.style.display='block';document.getElementById('champCardNm').textContent=S.champion;}else cc.style.display='none';
+  renderFighters(); renderMatchGrid();
+  renderBkt(document.getElementById('aBkt'), true);
+  renderSchedEdit();
 }
 
-function renderAll() {
-  renderViewer();
-  if (isAdmin) renderAdmin();
-}
+function renderAll() { renderViewer(); if(isAdmin) renderAdmin(); }
 
-// ── SCHEDULE ────────────────────────────────────────────
-function renderScheduleView() {
-  const el = document.getElementById('scheduleView');
-  if (!el) return;
-  let h = '';
-  S.bracket.forEach(r => r.matches.forEach(m => {
-    if (m.bye || !m.f1 || !m.f2) return;
-    const sc = S.schedule[m.id] || {};
-    const cur = S.currentMatch === m.id;
-    h += `<div class="sched-row${cur?' current':''}">
-      <div class="sched-time">${sc.date||'—'}<br>${sc.time||'—'}</div>
-      <div class="sched-red">■ ${m.f1}</div>
-      <div class="sched-blue">■ ${m.f2}</div>
-      <div>${m.winner?`<span class="badge badge-done">✔ ${m.winner.split(' ')[0]}</span>`:cur?'<span class="badge badge-live">LIVE</span>':'<span class="badge badge-wait">—</span>'}</div>
+// ── SCHEDULE ─────────────────────────────────────────────────
+function renderSchedView() {
+  const el=document.getElementById('schedView'); if(!el) return;
+  let h='';
+  S.bracket.forEach(r=>r.matches.forEach(m=>{
+    if(m.bye||!m.f1||!m.f2)return;
+    const sc=S.schedule[m.id]||{},cur=S.currentMatch===m.id;
+    h+=`<div class="srow${cur?' cur':''}">
+      <div class="srow-time">${sc.date||'—'}<br>${sc.time||'—'}</div>
+      <div class="srow-r">■ ${m.f1}</div><div class="srow-b">■ ${m.f2}</div>
+      <div>${m.winner?'<span class="badge b-done">✔</span>':cur?'<span class="badge b-live">LIVE</span>':'<span class="badge b-wait">—</span>'}</div>
     </div>`;
   }));
-  el.innerHTML = h || '<div style="padding:24px;text-align:center;font-family:Share Tech Mono,monospace;font-size:9px;letter-spacing:3px;color:var(--td)">SEM COMBATES AGENDADOS</div>';
+  el.innerHTML=h||'<div style="padding:24px;text-align:center;font-family:Share Tech Mono,monospace;font-size:9px;letter-spacing:3px;color:var(--td)">SEM COMBATES</div>';
 }
 
-function renderScheduleEdit() {
-  const el = document.getElementById('schedEditList');
-  if (!el) return;
-  let h = '';
-  S.bracket.forEach(r => r.matches.forEach(m => {
-    if (m.bye || !m.f1 || !m.f2) return;
-    const sc = S.schedule[m.id] || {};
-    h += `<div class="sched-edit-row">
-      <div class="sched-edit-name"><span style="color:rgba(200,80,60,1)">■ ${m.f1}</span><br><span style="color:rgba(70,110,210,1)">■ ${m.f2}</span></div>
-      <input class="sched-input" type="date" id="sd_${m.id}" value="${sc.date||''}">
-      <input class="sched-input" type="time" style="width:85px" id="st_${m.id}" value="${sc.time||''}">
+function renderSchedEdit() {
+  const el=document.getElementById('schedEdit'); if(!el) return;
+  let h='';
+  S.bracket.forEach(r=>r.matches.forEach(m=>{
+    if(m.bye||!m.f1||!m.f2)return;
+    const sc=S.schedule[m.id]||{};
+    h+=`<div class="se-row">
+      <div class="se-nm"><span style="color:rgba(200,80,60,1)">■ ${m.f1}</span><br><span style="color:rgba(70,110,210,1)">■ ${m.f2}</span></div>
+      <input class="si" type="date" id="sd_${m.id}" value="${sc.date||''}">
+      <input class="si" type="time" style="width:85px" id="st_${m.id}" value="${sc.time||''}">
     </div>`;
   }));
-  el.innerHTML = h || '<div style="color:var(--td);font-size:12px">Gera o bracket primeiro</div>';
+  el.innerHTML=h||'<div style="color:var(--td);font-size:12px">Gera o bracket primeiro</div>';
 }
 
 function saveSchedule() {
-  S.bracket.forEach(r => r.matches.forEach(m => {
-    if (m.bye || !m.f1 || !m.f2) return;
-    const d = document.getElementById('sd_' + m.id), t = document.getElementById('st_' + m.id);
-    S.schedule[m.id] = { date: d?.value || '', time: t?.value || '' };
+  S.bracket.forEach(r=>r.matches.forEach(m=>{
+    if(m.bye||!m.f1||!m.f2)return;
+    const d=document.getElementById('sd_'+m.id),t=document.getElementById('st_'+m.id);
+    S.schedule[m.id]={date:d?.value||'',time:t?.value||''};
   }));
-  save(); toast('Calendário guardado!', 'ok');
+  save(); toast('Calendário guardado!','ok');
 }
 
-// ── MATCH SELECT ────────────────────────────────────────
+// ── MATCH GRID ───────────────────────────────────────────────
 function renderMatchGrid() {
-  const el = document.getElementById('matchGrid');
-  if (!el) return;
-  if (!S.bracket.length) { el.innerHTML = '<div style="color:var(--td);font-family:Share Tech Mono,monospace;font-size:9px">Gera o bracket primeiro</div>'; return; }
-  let h = '';
-  S.bracket.forEach(r => r.matches.forEach(m => {
-    if (m.bye || !m.f1 || !m.f2) return;
-    h += `<div class="match-card ${S.currentMatch===m.id?'selected':''} ${m.winner?'done':''}" onclick="selectMatch('${m.id}')">
-      <div class="match-card-round">${m.label}</div>
-      <div class="match-card-names">
-        <span style="color:rgba(200,80,60,1)">■ ${m.f1}</span><br>
-        <span style="color:rgba(70,110,210,1)">■ ${m.f2}</span>
-      </div>
+  const el=document.getElementById('matchGrid'); if(!el) return;
+  if(!S.bracket.length){el.innerHTML='<div style="color:var(--td);font-family:Share Tech Mono,monospace;font-size:9px">Gera o bracket primeiro</div>';return;}
+  let h='';
+  S.bracket.forEach(r=>r.matches.forEach(m=>{
+    if(m.bye||!m.f1||!m.f2)return;
+    h+=`<div class="mc ${S.currentMatch===m.id?'sel':''} ${m.winner?'done':''}" onclick="selectMatch('${m.id}')">
+      <div class="mc-r">${m.label}</div>
+      <div style="font-weight:600;line-height:1.6"><span style="color:rgba(200,80,60,1)">■ ${m.f1}</span><br><span style="color:rgba(70,110,210,1)">■ ${m.f2}</span></div>
       ${m.winner?`<div style="font-family:Share Tech Mono,monospace;font-size:8px;color:var(--go);margin-top:3px">⚔ ${m.winner}</div>`:''}</div>`;
   }));
-  el.innerHTML = h || '<div style="color:var(--td);font-size:12px">Sem combates</div>';
+  el.innerHTML=h||'<div style="color:var(--td);font-size:12px">Sem combates</div>';
 }
 
 function selectMatch(id) {
-  pauseTimer();
-  S.currentMatch = id;
-  S.currentRound = 1;
-  const m = getMatch(id);
-  S.scoreRed = m?.s1 || 0;
-  S.scoreBlue = m?.s2 || 0;
-  S.timerSec = S.roundDuration;
+  S.timerRunning = false; S.timerStartedAt = null; S.timerPausedAt = null;
+  stopDisplayLoop();
+  S.currentMatch=id; S.currentRound=1;
+  const m=getMatch(id); S.scoreRed=m?.s1||0; S.scoreBlue=m?.s2||0;
   save(); renderAll();
 }
 
-// ── TIMER ────────────────────────────────────────────────
-function startTimer() {
-  if (S.timerRunning) return;
-  if (!S.currentMatch) return toast('Selecciona um combate', 'err');
-  S.timerRunning = true;
-  document.getElementById('btnStart').style.display = 'none';
-  document.getElementById('btnPause').style.display = 'flex';
-  timerInterval = setInterval(() => {
-    if (S.timerSec > 0) {
-      S.timerSec--;
-      renderAdmin(); renderViewer(); quickSave();
-    } else {
-      pauseTimer();
-      toast('Round ' + S.currentRound + ' terminado!', 'info');
-      if (S.currentRound < 3) setTimeout(nextRound, 1500);
-    }
-  }, 1000);
+// ── SCORES ───────────────────────────────────────────────────
+function adjScore(t,v) {
+  if(t==='red')S.scoreRed=Math.max(0,S.scoreRed+v);else S.scoreBlue=Math.max(0,S.scoreBlue+v);
+  const m=getMatch(S.currentMatch);if(m){m.s1=S.scoreRed;m.s2=S.scoreBlue;}
+  renderAdmin();renderViewer();save();
 }
 
-function pauseTimer() {
-  S.timerRunning = false;
-  clearInterval(timerInterval);
-  document.getElementById('btnStart').style.display = 'flex';
-  document.getElementById('btnPause').style.display = 'none';
-  quickSave();
+// ── WINNER ───────────────────────────────────────────────────
+function openWinModal() {
+  if(!S.currentMatch)return toast('Selecciona um combate','err');
+  const m=getMatch(S.currentMatch);
+  document.getElementById('modalSub').textContent=(m?.f1||'?')+' vs '+(m?.f2||'?');
+  document.getElementById('wbR').textContent=m?.f1||'Vermelho';
+  document.getElementById('wbB').textContent=m?.f2||'Azul';
+  document.getElementById('winModal').classList.add('show');
 }
-
-function resetTimer() { pauseTimer(); S.timerSec = S.roundDuration; renderAdmin(); quickSave(); }
-function nextRound() {
-  if (S.currentRound < 3) {
-    S.currentRound++; S.timerSec = S.roundDuration;
-    renderAll(); save(); toast('Round ' + S.currentRound, 'info');
-  }
-}
-function setRound(n) { pauseTimer(); S.currentRound = n; S.timerSec = S.roundDuration; renderAdmin(); save(); }
-
-// ── SCORES ───────────────────────────────────────────────
-function adjustScore(team, val) {
-  if (team === 'red') S.scoreRed = Math.max(0, S.scoreRed + val);
-  else S.scoreBlue = Math.max(0, S.scoreBlue + val);
-  const m = getMatch(S.currentMatch);
-  if (m) { m.s1 = S.scoreRed; m.s2 = S.scoreBlue; }
-  renderAdmin(); renderViewer(); save();
-}
-
-// ── WINNER ───────────────────────────────────────────────
-function openWinnerModal() {
-  if (!S.currentMatch) return toast('Selecciona um combate', 'err');
-  const m = getMatch(S.currentMatch);
-  document.getElementById('modalSub').textContent = (m?.f1 || '?') + ' vs ' + (m?.f2 || '?');
-  document.getElementById('wbRed').textContent = m?.f1 || 'Vermelho';
-  document.getElementById('wbBlue').textContent = m?.f2 || 'Azul';
-  document.getElementById('winnerModal').classList.add('show');
-}
-function closeWinnerModal() { document.getElementById('winnerModal').classList.remove('show'); }
+function closeWinModal(){document.getElementById('winModal').classList.remove('show');}
 
 function declareWinner(side) {
-  pauseTimer();
-  const m = getMatch(S.currentMatch);
-  if (!m) return closeWinnerModal();
-  const winner = side === 'red' ? m.f1 : side === 'blue' ? m.f2 : (m.f1 + '/' + m.f2);
-  m.winner = winner; m.s1 = S.scoreRed; m.s2 = S.scoreBlue;
-
-  // Avançar vencedor no bracket
-  const ri = S.bracket.findIndex(r => r.matches.some(x => x.id === m.id));
-  const mi = S.bracket[ri].matches.findIndex(x => x.id === m.id);
-  if (ri + 1 < S.bracket.length) {
-    const next = S.bracket[ri+1].matches[Math.floor(mi/2)];
-    if (next) { if (mi%2===0) next.f1 = winner; else next.f2 = winner; }
-  } else {
-    S.champion = winner;
-    toast('🏆 CAMPEÃO: ' + winner, 'ok');
-  }
-
-  closeWinnerModal(); save(); renderAll(); toast('🏆 ' + winner + ' vence!', 'ok');
+  const m=getMatch(S.currentMatch);if(!m)return closeWinModal();
+  S.timerRunning=false;S.timerStartedAt=null;S.timerPausedAt=null;stopDisplayLoop();
+  const w=side==='red'?m.f1:side==='blue'?m.f2:m.f1+'/'+m.f2;
+  m.winner=w;m.s1=S.scoreRed;m.s2=S.scoreBlue;
+  const ri=S.bracket.findIndex(r=>r.matches.some(x=>x.id===m.id));
+  const mi=S.bracket[ri].matches.findIndex(x=>x.id===m.id);
+  if(ri+1<S.bracket.length){const nx=S.bracket[ri+1].matches[Math.floor(mi/2)];if(nx){if(mi%2===0)nx.f1=w;else nx.f2=w;}}
+  else{S.champion=w;toast('🏆 CAMPEÃO: '+w,'ok');}
+  closeWinModal();save();renderAll();toast('🏆 '+w+' vence!','ok');
 }
 
 function resetMatch() {
-  if (!S.currentMatch || !confirm('Resetar combate?')) return;
-  pauseTimer();
-  const m = getMatch(S.currentMatch);
-  if (m) { m.s1 = 0; m.s2 = 0; m.winner = null; }
-  S.scoreRed = 0; S.scoreBlue = 0; S.currentRound = 1; S.timerSec = S.roundDuration;
-  save(); renderAll();
+  if(!S.currentMatch||!confirm('Resetar?'))return;
+  S.timerRunning=false;S.timerStartedAt=null;S.timerPausedAt=null;stopDisplayLoop();
+  const m=getMatch(S.currentMatch);
+  if(m){m.s1=0;m.s2=0;m.winner=null;}
+  S.scoreRed=0;S.scoreBlue=0;S.currentRound=1;
+  save();renderAll();
 }
 
 function resetAll() {
-  if (!confirm('RESET TOTAL? Apaga tudo.')) return;
-  pauseTimer();
-  S = { champName:'PT BOXING CHAMPIONSHIP', adminPin:'1234', fighters:[], bracket:[], schedule:{}, currentMatch:null, currentRound:1, roundDuration:180, scoreRed:0, scoreBlue:0, timerSec:180, timerRunning:false, champion:null };
-  save(); renderAll(); toast('Reset completo', 'info');
+  if(!confirm('RESET TOTAL?'))return;
+  stopDisplayLoop();
+  S={champName:'PT BOXING CHAMPIONSHIP',adminPin:'1234',fighters:[],bracket:[],schedule:{},currentMatch:null,currentRound:1,roundDuration:180,timerRunning:false,timerStartedAt:null,timerPausedAt:null,scoreRed:0,scoreBlue:0,champion:null};
+  save();renderAll();toast('Reset completo','info');
 }
 
-// ── TABS ─────────────────────────────────────────────────
-function switchTab(name) {
-  document.querySelectorAll('.tab').forEach((t,i) => {
-    const names = ['control','bracket','schedule','tp'];
-    t.classList.toggle('active', names[i] === name);
-  });
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
+// ── TABS ─────────────────────────────────────────────────────
+function switchTab(n) {
+  document.querySelectorAll('.tab').forEach((t,i)=>{const ns=['ctrl','bkt','sch','tp'];t.classList.toggle('active',ns[i]===n);});
+  document.querySelectorAll('.tab-p').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+n).classList.add('active');
 }
 
-// ── TOUCHPORTAL ──────────────────────────────────────────
+// ── TOUCHPORTAL ──────────────────────────────────────────────
 function checkTP() {
-  const r = localStorage.getItem('pt_cmd');
-  if (!r) return;
+  const r=localStorage.getItem('pt_cmd');if(!r)return;
   localStorage.removeItem('pt_cmd');
-  try {
-    const c = JSON.parse(r);
-    if (c.cmd === 'start_timer') startTimer();
-    else if (c.cmd === 'pause_timer') pauseTimer();
-    else if (c.cmd === 'next_round') nextRound();
-    else if (c.cmd === 'score') adjustScore(c.team, c.val || 1);
-    else if (c.cmd === 'winner') declareWinner(c.team);
-  } catch(e) {}
+  try{const c=JSON.parse(r);
+    if(c.cmd==='start_timer')startTimer();
+    else if(c.cmd==='pause_timer')pauseTimer();
+    else if(c.cmd==='next_round')nextRound();
+    else if(c.cmd==='score')adjScore(c.team,c.val||1);
+    else if(c.cmd==='winner')declareWinner(c.team);
+  }catch(e){}
 }
 
-// ── UTILS ────────────────────────────────────────────────
-function fmt(s) { return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
-function toast(msg, type='info') {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast show ' + type;
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.classList.remove('show'), 3000);
+// ── UTILS ────────────────────────────────────────────────────
+function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+function toast(msg,type='info'){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className='toast show '+type;
+  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),3000);
 }
 
 init();
-  setInterval(async () => {
-  if (!db) return;
-
-  try {
-    const { data } = await db
-      .from('boxing_state')
-      .select('data')
-      .eq('id', 'main')
-      .single();
-
-    if (data?.data) {
-      applyState(data.data);
-    }
-
-  } catch (err) {
-    console.log("Auto refresh error:", err);
-  }
-
-}, 300);
 </script>
 </body>
 </html>
