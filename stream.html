@@ -132,10 +132,10 @@ function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
 function getM(S,id){if(!id||!S.bracket)return null;for(const r of S.bracket)for(const m of r.matches)if(m.id===id)return m;return null;}
 function render(S){
   if(!S)return;
-  const m=getM(S,S.currentMatchId);
-  document.getElementById('rN').textContent=m?.fighter1||' ';
-  document.getElementById('bN').textContent=m?.fighter2||' ';
-  document.getElementById('cRT').textContent=m?.roundName||' ';
+  const m=getM(S,S.currentMatch);
+  document.getElementById('rN').textContent=m?.f1||' ';
+  document.getElementById('bN').textContent=m?.f2||' ';
+  document.getElementById('cRT').textContent=m?.label||' ';
   const tv=document.getElementById('cT');
   tv.textContent=fmt(S.timerSec||0);
   tv.className='tmr'+(S.timerSec<=10&&S.timerSec>0?' danger':'');
