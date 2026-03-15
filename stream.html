@@ -8,14 +8,14 @@
 <style>
 :root{--re:#bb2000;--bl:#1840bb;--go:#d4a800;--gb:#f0c000;}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:transparent;width:1920px;height:200px;overflow:hidden;font-family:Oswald,sans-serif}
+body{background:transparent;width:1920px;height:100vh;overflow:hidden;font-family:Oswald,sans-serif}
 .pts{position:fixed;inset:0;pointer-events:none;z-index:150;overflow:hidden}
 .pt{position:absolute;top:-20px;animation:fall linear forwards}
 @keyframes fall{to{transform:translateY(220px) rotate(720deg);opacity:0}}
 .bar{width:1920px;height:200px;display:grid;grid-template-columns:1fr 340px 1fr;align-items:center;
   background:linear-gradient(180deg,rgba(6,7,6,0) 0%,rgba(6,7,6,.94) 22%,rgba(6,7,6,.98) 100%);
-  padding:0 40px;position:relative}
-.bar::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  padding:0 40px;position:fixed;bottom:0;left:0}
+.bar::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
   background:linear-gradient(90deg,var(--re),var(--go),var(--bl))}
 .side-r{display:flex;align-items:center;height:130px;
   background:linear-gradient(90deg,rgba(139,0,0,.22),transparent);
@@ -50,9 +50,10 @@ body{background:transparent;width:1920px;height:200px;overflow:hidden;font-famil
   padding:2px 9px;font-family:"Share Tech Mono",monospace;font-size:9px;letter-spacing:3px;
   color:white;animation:lp 2s infinite;display:none}
 @keyframes lp{0%,100%{opacity:1}50%{opacity:.5}}
-.wspl{position:fixed;inset:0;display:none;background:rgba(6,7,6,.93);z-index:100;
-  grid-template-columns:1fr 340px 1fr;align-items:center;padding:0 40px;gap:0}
-.wspl::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+.wspl{position:fixed;inset:0;display:none;background:rgba(6,7,6,.93);z-index:200;
+  grid-template-columns:1fr 340px 1fr;align-items:center;padding:0 40px;gap:0;
+  width:1920px;height:100vh}
+.wspl::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
   background:linear-gradient(90deg,var(--re),var(--go),var(--bl))}
 .wspl.show{display:grid;animation:wIn .5s ease}
 @keyframes wIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
@@ -73,7 +74,7 @@ body{background:transparent;width:1920px;height:200px;overflow:hidden;font-famil
   color:var(--gb);text-shadow:0 0 60px rgba(212,168,0,.7);animation:sh 2s ease infinite;text-align:center}
 @keyframes sh{0%,100%{text-shadow:0 0 60px rgba(212,168,0,.6)}50%{text-shadow:0 0 110px rgba(212,168,0,1)}}
 .cov{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;
-  background:rgba(6,7,6,.96);z-index:200}
+  background:rgba(6,7,6,.96);z-index:300;width:1920px;height:100vh}
 .cov.show{display:flex}
 .cico{font-size:72px;animation:flt 1.2s ease-in-out infinite}
 .clbl{font-family:"Share Tech Mono",monospace;font-size:13px;letter-spacing:8px;color:rgba(255,255,255,.38);
